@@ -16,7 +16,20 @@ class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
+    protected $fillable = [
+        'first_name',
+        'last_name',
+        'middle_name',
+        'email',
+        'usn',
+        'usertype_id',
+        'password',
+    ];
 
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
     /**
      * Get the attributes that should be cast.
      *
@@ -28,5 +41,9 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+    public function usertype(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Usertype::class);
     }
 }
