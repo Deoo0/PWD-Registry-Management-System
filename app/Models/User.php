@@ -21,27 +21,35 @@ class User extends Authenticatable
         'last_name',
         'middle_name',
         'email',
-        'usn',
-        'usertype_id',
+        'username',
         'password',
+        'usertype_id',
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
     ];
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
     /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
      */
-    protected function casts(): array
+
+    public function isAdmin(): bool
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->usertype_id === 1;
     }
+ 
+    public function isStaff(): bool
+    {
+        return $this->usertype_id === 2;
+    }
+
+
     public function usertype(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(\App\Models\Usertype::class);
