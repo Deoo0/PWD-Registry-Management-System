@@ -9,12 +9,22 @@ class DisabilityType extends Model
 {
     use HasFactory;
 
+    protected $table = 'disability_type';
+
     protected $fillable = ['name'];
 
     // ── Relationships ──────────────────────────────────────────
 
-    public function applicationDisabilities(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function pwdDisabilities(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(ApplicationDisability::class);
+        return $this->hasMany(PwdDisability::class);
+    }
+
+    /**
+     * PWDs that have this disability type.
+     */
+    public function pwds(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Pwd::class, 'pwd_disabilities');
     }
 }

@@ -22,7 +22,7 @@ class UserFactory extends Factory
             'middle_name'       => fake()->lastName(),
             'email'             => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'usn'               => fake()->unique()->numerify('USN-#####'),
+            'username'               => fake()->unique()->numerify('USN-#####'),
             'usertype_id'       => DB::table('usertype')->where('name', 'Admin')->value('id'),
             'password'          => static::$password ??= Hash::make('password'),
             'remember_token'    => Str::random(10),

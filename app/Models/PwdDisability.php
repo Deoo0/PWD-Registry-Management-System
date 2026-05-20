@@ -5,20 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class ApplicationDisability extends Model
+class PwdDisability extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'application_id',
+        'pwd_id',
         'disability_type_id',
     ];
 
     // ── Relationships ──────────────────────────────────────────
 
-    public function application(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function pwd(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(Application::class);
+        return $this->belongsTo(Pwd::class);
     }
 
     public function disabilityType(): \Illuminate\Database\Eloquent\Relations\BelongsTo

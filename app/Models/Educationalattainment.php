@@ -3,13 +3,18 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class EducationalAttainment extends Model
 {
+    use HasFactory;
+    
     protected $fillable = ['name'];
+    
+    protected $table = 'educational_attainments';
 
     public function applicants(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(Applicant::class);
+        return $this->hasMany(Pwd::class);
     }
 }

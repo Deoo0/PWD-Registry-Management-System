@@ -6,28 +6,25 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('application_disabilities', function (Blueprint $table) {
+        Schema::create('pwd_disabilities', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('application_id')
-                ->constrained('applications');
+
+            $table->foreignId('pwd_id')
+                ->constrained('pwds')
+                ->onDelete('cascade');
 
             $table->foreignId('disability_type_id')
-                ->constrained('disability_type');
+                ->constrained('disability_type')
+                ->onDelete('cascade');
 
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('application_disabilities');
+        Schema::dropIfExists('pwd_disabilities');
     }
 };

@@ -28,22 +28,17 @@ class EducationalAttainmentSeeder extends Seeder
 {
     public function run(): void
     {
-        $attainments = [
-            'None',
-            'Kindergarten',
-            'Elementary',
-            'Junior High School',
-            'Senior High School',
-            'College',
-            'Vocational',
-            'Post Graduate',
-        ];
-
-        foreach ($attainments as $attainment) {
-            DB::table('educational_attainments')->updateOrInsert(
-                ['name' => $attainment],
-                ['name' => $attainment, 'created_at' => now(), 'updated_at' => now()]
-            );
-        }
+        DB::table('educational_attainments')->insert([
+            ['name' => 'No Formal Education', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Elementary Level', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Elementary Graduate', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'High School Level', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'High School Graduate', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Senior High School Level', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Senior High School Graduate', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'College Level', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'College Graduate', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Vocational', 'created_at' => now(), 'updated_at' => now()],
+        ]);
     }
 }

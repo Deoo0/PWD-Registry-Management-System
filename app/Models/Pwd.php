@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Applicant extends Model
+class Pwd extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -24,6 +24,7 @@ class Applicant extends Model
         'email',
         'pwd_number',
         'residence_id',
+        'photo_path',
     ];
 
     protected $casts = [
@@ -52,19 +53,17 @@ class Applicant extends Model
         return $this->belongsTo(Residence::class);
     }
 
-    public function applications(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function disabilities(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
-        return $this->hasMany(Application::class);
+        return $this->belongsToMany(DisabilityType::class, 'pwd_disabilities','pwd_id','disability_type_id');
     }
 
-    /**
-     * The most recent application for this applicant.
-     */
     public function latestApplication(): \Illuminate\Database\Eloquent\Relations\HasOne
-    {
-        return $this->hasOne(Application::class)->latestOfMany();
-    }
-
+{
+    return $this->hasOne(Application::class)->latestOfMany();
+}
+    
+    
     // ── Accessors ──────────────────────────────────────────────
 
     /**

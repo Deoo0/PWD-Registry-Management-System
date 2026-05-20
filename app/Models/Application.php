@@ -49,27 +49,21 @@ class Application extends Model
     }
 
     /**
+     * The disabilities associated with this application.
+     */
+    public function disabilities(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(DisabilityType::class, 'application_disabilities');
+    }
+
+    /**
      * Pivot records linking this application to disability types.
      */
     public function applicationDisabilities(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(ApplicationDisability::class);
-    }
-
-    /**
-     * Disability types for this application (through the pivot).
-     */
-    public function disabilities(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
-    {
-        return $this->hasManyThrough(
-            DisabilityType::class,
-            ApplicationDisability::class,
-            'application_id',   // FK on application_disabilities
-            'id',               // FK on disability_types
-            'id',               // local key on applications
-            'disability_type_id'// local key on application_disabilities
-        );
-    }
+    }    
+    
 
     /**
      * Family members listed on this application.

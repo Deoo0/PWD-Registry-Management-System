@@ -16,6 +16,6 @@ class Residence extends Model
 
     public function applicants(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(Applicant::class);
+        return $this->hasMany(Pwd::class);
     }
 }

@@ -209,13 +209,13 @@
                             Username
                         </label>
                         <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            value="{{ old('email') }}"
+                            type="string"
+                            id="username"
+                            name="username"
+                            value="{{ old('usernae') }}"
                             required
                             autofocus
-                            autocomplete="email"
+                            autocomplete="username"
                             placeholder="John Doe"
                             class="input-field w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-800 text-sm transition-all duration-200 @error('email') border-red-400 bg-red-50 @enderror"
                         />
