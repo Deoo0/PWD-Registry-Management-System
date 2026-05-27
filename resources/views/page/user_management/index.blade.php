@@ -77,7 +77,7 @@
                                 </div>
                             </div>
                         </td>
-                        <td style="font-family:monospace;font-size:11.5px;color:var(--s500);">{{ $user->usn }}</td>
+                        <td style="font-family:monospace;font-size:11.5px;color:var(--s500);">{{ $user->username }}</td>
                         <td>
                             <span class="badge {{ $user->usertype->name === 'Admin' ? 'b-adm' : ($user->usertype->name === 'Encoder' ? 'b-enc' : 'b-apr') }}">
                                 {{ $user->usertype->name }}
@@ -91,7 +91,7 @@
                         <td style="font-size:12px;color:var(--s500);">{{ $user->created_at->format('M d, Y') }}</td>
                         <td>
                             <div style="display:flex;gap:5px;">
-                                <button class="btn btn-o btn-sm" onclick="openEdit({{ $user->id }}, '{{ addslashes($user->first_name) }}', '{{ addslashes($user->last_name) }}', '{{ addslashes($user->middle_name ?? '') }}', '{{ addslashes($user->email) }}', '{{ $user->usn }}', {{ $user->usertype_id }})">
+                                <button class="btn btn-o btn-sm" onclick="openEdit({{ $user->id }}, '{{ addslashes($user->first_name) }}', '{{ addslashes($user->last_name) }}', '{{ addslashes($user->middle_name ?? '') }}', '{{ addslashes($user->email) }}', '{{ $user->username }}', {{ $user->usertype_id }})">
                                     Edit
                                 </button>
                                 @if($user->id !== Auth::id())
@@ -169,8 +169,8 @@
                 <div class="g2">
                     <div class="fg">
                         <label class="fl">USN <span style="color:var(--red)">*</span></label>
-                        <input type="text" name="usn" class="fi @error('usn') err @enderror" value="{{ old('usn') }}" placeholder="USN-00000" required>
-                        @error('usn')<div class="fe">{{ $message }}</div>@enderror
+                        <input type="text" name="username" class="fi @error('username') err @enderror" value="{{ old('username') }}" placeholder="USN-00000" required>
+                        @error('username')<div class="fe">{{ $message }}</div>@enderror
                     </div>
                     <div class="fg">
                         <label class="fl">Role <span style="color:var(--red)">*</span></label>
@@ -236,7 +236,7 @@
                 <div class="g2">
                     <div class="fg">
                         <label class="fl">USN <span style="color:var(--red)">*</span></label>
-                        <input type="text" name="usn" id="e_usn" class="fi" required>
+                        <input type="text" name="username" id="e_usn" class="fi" required>
                     </div>
                     <div class="fg">
                         <label class="fl">Role <span style="color:var(--red)">*</span></label>
@@ -273,13 +273,13 @@
 
 @section('scripts')
 <script>
-function openEdit(id, firstName, lastName, middleName, email, usn, usertypeId) {
+function openEdit(id, firstName, lastName, middleName, email, username, usertypeId) {
     document.getElementById('editForm').action = `/users/${id}`;
     document.getElementById('e_first_name').value  = firstName;
     document.getElementById('e_last_name').value   = lastName;
     document.getElementById('e_middle_name').value = middleName;
     document.getElementById('e_email').value       = email;
-    document.getElementById('e_usn').value         = usn;
+    document.getElementById('e_usn').value         = username;
     document.getElementById('e_usertype_id').value = usertypeId;
     document.getElementById('mEdit').classList.add('open');
 }
@@ -291,8 +291,15 @@ function filterUsers(q) {
     });
 }
 
+</script>
+
+@if(session('success'))
+    // wire to your toast/alert system, or simply:
+    console.log('{{ session('success') }}');
+@endif
+
 @if($errors->any() && old('_create_modal'))
     document.getElementById('mCreate').classList.add('open');
 @endif
-</script>
+
 @endsection
