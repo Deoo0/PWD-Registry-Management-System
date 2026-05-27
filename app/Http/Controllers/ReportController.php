@@ -17,6 +17,7 @@ class ReportController extends Controller
         $totalFemale = \App\Models\Pwd::where('sex', 'Female')->count();
         $totalMinor = \App\Models\Pwd::whereRaw('EXTRACT(YEAR FROM AGE(date_of_birth)) BETWEEN 0 AND 17')->count();
         $totalSenior = \App\Models\Pwd::whereRaw('EXTRACT(YEAR FROM AGE(date_of_birth)) >= 60')->count();
+        $pwds = \App\Models\Pwd::latest()->paginate(15)->withQueryString();
         
         // Get disability statistics (using correct table name)
         $disabilityStats = \App\Models\DisabilityType::withCount('pwdDisabilities')
@@ -30,7 +31,7 @@ class ReportController extends Controller
             
         return view('page.reports.index', compact(
             'total', 'totalMale', 'totalFemale', 'totalMinor', 'totalSenior',
-            'disabilityStats'
+            'disabilityStats', 'pwds'
         ));
     }
     

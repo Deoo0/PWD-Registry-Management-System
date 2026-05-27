@@ -14,11 +14,12 @@ class UserController extends Controller
     public function index()
     {
         $users = User::with('usertype')->paginate(15);
+        $usertypes = Usertype::orderBy('name')->get();
         $adminCount = User::where('usertype_id', 1)->count();
         $encoderCount = User::where('usertype_id', 2)->count();
         $approverCount = User::where('usertype_id', 3)->count();
         
-        return view('page.user_management.index', compact('users', 'adminCount', 'encoderCount', 'approverCount'));
+        return view('page.user_management.index', compact('users','usertypes', 'adminCount', 'encoderCount', 'approverCount'));
     }
 
     /**

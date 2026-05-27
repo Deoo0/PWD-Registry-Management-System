@@ -83,7 +83,7 @@ class PwdController extends Controller
     /**
      * Show the registration form.
      */
-    public function create(): View
+    public function pwdCreate(): View
     {
         return view('page.pwd.form');
     }
@@ -91,7 +91,7 @@ class PwdController extends Controller
     /**
      * Store a new PWD record.
      */
-    public function store(Request $request): RedirectResponse
+    public function pwdStore(Request $request): RedirectResponse
     {
         $validated = $this->validatePwd($request);
 
@@ -157,7 +157,7 @@ class PwdController extends Controller
     /**
      * Show the edit form for an existing PWD.
      */
-    public function edit(Pwd $pwd): View
+    public function pwdEdit(Pwd $pwd): View
     {
         $pwd->load([
             'residence',
@@ -231,7 +231,7 @@ class PwdController extends Controller
     /**
      * Soft delete a PWD record.
      */
-    public function destroy(Pwd $pwd): RedirectResponse
+    public function pwdDestroy(Pwd $pwd): RedirectResponse
     {
         $pwd->disabilities()->detach(); // clean up pivot rows
         $pwd->delete();

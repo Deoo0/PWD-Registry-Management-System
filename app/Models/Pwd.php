@@ -83,4 +83,10 @@ class Pwd extends Model
     {
         return $this->date_of_birth->age;
     }
+    public function getLatestDisabilitiesAttribute(): string
+    {
+    // $this->disabilities is your existing BelongsToMany relationship
+    return $this->disabilities->pluck('name')->implode(', ') ?: '—';
+    }
+ 
 }

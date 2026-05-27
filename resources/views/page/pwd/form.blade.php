@@ -39,26 +39,11 @@
                     <div class="mbd">
                         <div class="g3">
                             <div class="fg">
-                                <label class="fl">Application Type <span style="color:var(--red)">*</span></label>
-                                <select name="application_type" class="fsel fi" required>
-                                    <option value="">Select…</option>
-                                    <option {{ old('application_type', $pwd->latestApplication?->application_type ?? '') === 'New Applicant' ? 'selected' : '' }}>New Applicant</option>
-                                    <option {{ old('application_type', $pwd->latestApplication?->application_type ?? '') === 'Renewal' ? 'selected' : '' }}>Renewal</option>
-                                </select>
-                                @error('application_type')<div class="fe">{{ $message }}</div>@enderror
-                            </div>
-                            <div class="fg">
                                 <label class="fl">PWD Number</label>
                                 <input type="text" name="pwd_number" class="fi @error('pwd_number') err @enderror"
                                     placeholder="RR-PPMM-BBB-NNNNNNNN"
                                     value="{{ old('pwd_number', $pwd->pwd_number ?? '') }}">
                                 @error('pwd_number')<div class="fe">{{ $message }}</div>@enderror
-                            </div>
-                            <div class="fg">
-                                <label class="fl">Date Applied <span style="color:var(--red)">*</span></label>
-                                <input type="date" name="date_applied" class="fi @error('date_applied') err @enderror"
-                                    value="{{ old('date_applied', isset($pwd) ? $pwd->latestApplication?->date_applied?->format('Y-m-d') : now()->format('Y-m-d')) }}" required>
-                                @error('date_applied')<div class="fe">{{ $message }}</div>@enderror
                             </div>
                         </div>
                     </div>
@@ -154,7 +139,7 @@
                         @php
                             $disabilityTypes = \App\Models\DisabilityType::all();
                             $selectedDisabilities = old('disability_types',
-                                isset($pwd) ? ($pwd->latestApplication?->applicationDisabilities->pluck('disability_type_id')->toArray() ?? []) : []
+                                isset($pwd) ? ($pwd->pluck('disability_type_id')->toArray() ?? []) : []
                             );
                         @endphp
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">

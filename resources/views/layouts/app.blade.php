@@ -59,7 +59,7 @@
         }
         .sb-logo {
             width: 34px; height: 34px; border-radius: 8px;
-            background: #FDD835; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
         }
         .sb-sys { font-family: 'Playfair Display', serif; font-size: 13px; color: white; line-height: 1.25; }
         .sb-ver { font-size: 9px; color: rgba(255,255,255,.28); text-transform: uppercase; letter-spacing: .12em; margin-top: 1px; }
@@ -267,21 +267,9 @@
 <aside id="sb">
     <div class="sb-top">
         <div class="sb-logo">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" style="width:24px;height:24px;">
-                <rect x="1" y="1" width="30" height="30" rx="3" fill="#FDD835"/>
-                <rect x="3" y="3" width="26" height="26" rx="2" fill="white"/>
-                <g fill="#1565C0">
-                    <ellipse cx="10" cy="21" rx="4" ry="2.5"/>
-                    <rect x="7" y="13" width="2" height="7" rx="1"/>
-                    <rect x="10" y="11" width="2" height="8" rx="1"/>
-                    <rect x="13" y="12" width="2" height="7" rx="1"/>
-                    <ellipse cx="22" cy="21" rx="4" ry="2.5"/>
-                    <rect x="23" y="13" width="2" height="7" rx="1"/>
-                    <rect x="20" y="11" width="2" height="8" rx="1"/>
-                    <rect x="17" y="12" width="2" height="7" rx="1"/>
-                </g>
-                <path d="M16,20 C16,20 8,15 8,10 C8,7 10.5,5.5 13,7 C14.2,7.8 15.2,9 16,9 C16.8,9 17.8,7.8 19,7 C21.5,5.5 24,7 24,10 C24,15 16,20 16,20Z" fill="#E53935"/>
-            </svg>
+            <img src="{{ asset('images/pwdao-logo.png') }}"
+                        alt="PWDAO Logo"
+                        class="w-14 h-14 object-contain drop-shadow-lg">
         </div>
         <div>
             <div class="sb-sys">PWD Registry</div>

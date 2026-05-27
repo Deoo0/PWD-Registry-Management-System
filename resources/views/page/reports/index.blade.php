@@ -398,15 +398,13 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {{--
-                            Backend: replace with:
                             @forelse($pwds as $pwd)
                             <tr>
                                 <td><div class="cp" style="font-size:12px;">{{ $pwd->last_name }}, {{ $pwd->first_name }}</div></td>
                                 <td><span class="badge {{ $pwd->sex === 'Male' ? 'b-m' : 'b-f' }}">{{ $pwd->sex }}</span></td>
                                 <td style="font-size:12px;">{{ $pwd->age }}</td>
                                 <td style="font-size:11.5px;max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-                                    {{ $pwd->latestApplication?->disabilities->pluck('name')->join(', ') ?: '—' }}
+                                    {{ $pwd->disabilities->pluck('name')->join(', ') ?: '—' }}
                                 </td>
                                 <td style="font-size:12px;">{{ $pwd->civilStatus?->name ?? '—' }}</td>
                                 <td style="font-size:12px;">{{ $pwd->educationalAttainment?->name ?? '—' }}</td>
@@ -416,15 +414,10 @@
                             @empty
                             <tr><td colspan="8"><div class="empty"><div class="empty-t">No records match</div></div></td></tr>
                             @endforelse
-                        --}}
-                        <tr><td colspan="8"><div class="empty">
-                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                            <div class="empty-t">Connect ha Backend Later</div>
-                        </div></td></tr>
                     </tbody>
                 </table>
             </div>
-            {{-- Backend: {{ $pwds->appends(request()->query())->links() }} --}}
+            {{ $pwds->appends(request()->query())->links() }}
             <div class="pag">
                 <a href="#" class="pb on">1</a>
                 <span class="pi">0 records</span>

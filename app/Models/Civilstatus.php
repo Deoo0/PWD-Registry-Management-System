@@ -14,7 +14,7 @@ class CivilStatus extends Model
     
     protected $table = 'civil_status';
 
-    public function applicants(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function pwds(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Pwd::class);
     }

@@ -36,7 +36,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/pwd',            [PwdController::class, 'index'])  ->name('pwd.index');
     Route::get('/pwd/{pwd}',      [PwdController::class, 'pwdShow'])   ->name('pwd.show');
 
-    Route::middleware('role:encoder,admin')->group(function () {
+    Route::middleware('role:1,2')->group(function () {
         Route::get('/pwd/create',        [PwdController::class, 'pwdCreate']) ->name('pwd.create');
         Route::post('/pwd',              [PwdController::class, 'pwdStore'])  ->name('pwd.store');
         Route::get('/pwd/{pwd}/edit',    [PwdController::class, 'pwdEdit'])   ->name('pwd.edit');
@@ -68,7 +68,7 @@ Route::middleware('auth')->group(function () {
     |       $middleware->alias(['role' => \App\Http\Middleware\RoleMiddleware::class]);
     |   })
     */
-    Route::middleware('role:admin')->group(function () {
+    Route::middleware('role:1')->group(function () {
         Route::resource('users', UserController::class)->except(['show']);
         Route::patch('/users/{user}/toggle', [UserController::class, 'toggle'])->name('users.toggle');
     });

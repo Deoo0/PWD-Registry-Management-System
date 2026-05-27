@@ -13,7 +13,7 @@ class EducationalAttainment extends Model
     
     protected $table = 'educational_attainments';
 
-    public function applicants(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function pwds(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Pwd::class);
     }

@@ -97,29 +97,15 @@
             <div class="card">
                 <div class="card-hd"><div class="card-t">Top Disabilities</div></div>
                 <div style="padding:14px 18px;">
-                    {{--
-                        Backend: pass $disabilitySummary as:
-                        [['name'=>'Physical Disability','count'=>42,'pct'=>40], ...]
-
-                        Query:
-                        DisabilityType::withCount('applicationDisabilities')
-                            ->orderByDesc('application_disabilities_count')
-                            ->take(6)->get()
-                            ->map(fn($d) => [
-                                'name'  => $d->name,
-                                'count' => $d->application_disabilities_count,
-                                'pct'   => $total > 0 ? round($d->application_disabilities_count / $total * 100) : 0,
-                            ])
-                    --}}
                     @php
                         $dcols = ['#1549a8','#d97706','#047857','#b91c1c','#7c3aed','#0891b2'];
-                        $dph   = [['Physical Disability',0,0],['Visual Disability',0,0],['Deaf/Hard of Hearing',0,0],['Mental Disability',0,0],['Intellectual',0,0],['Others',0,0]];
+
                     @endphp
-                    @foreach($dph as $i => [$n,$c,$p])
+                    @foreach($disabilitySummary as $i => $d)
                     <div class="bar-row">
-                        <div class="bar-lbl" style="width:130px;">{{ $n }}</div>
-                        <div class="bar-track"><div class="bar-fill" style="width:{{ $p }}%;background:{{ $dcols[$i] }};"></div></div>
-                        <div class="bar-cnt">{{ $c }}</div>
+                        <div class="bar-lbl" style="width:130px;">{{ $d['name'] }}</div>
+                        <div class="bar-track"><div class="bar-fill" style="width:{{ $d['pct'] }}%;background:{{ $dcols[$i] }};"></div></div>
+                        <div class="bar-cnt">{{ $d['count'] }}</div>
                     </div>
                     @endforeach
                 </div>
