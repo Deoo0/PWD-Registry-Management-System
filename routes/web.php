@@ -34,8 +34,7 @@ Route::middleware('auth')->group(function () {
 
     // PWD Registry — all roles can view; Encoder can create/edit
     Route::get('/pwd',            [PwdController::class, 'index'])  ->name('pwd.index');
-    Route::get('/pwd/{pwd}',      [PwdController::class, 'pwdShow'])   ->name('pwd.show');
-
+    
     Route::middleware('role:1,2')->group(function () {
         Route::get('/pwd/create',        [PwdController::class, 'pwdCreate']) ->name('pwd.create');
         Route::post('/pwd',              [PwdController::class, 'pwdStore'])  ->name('pwd.store');
@@ -43,6 +42,7 @@ Route::middleware('auth')->group(function () {
         Route::put('/pwd/{pwd}',         [PwdController::class, 'pwdUpdate']) ->name('pwd.update');
         Route::delete('/pwd/{pwd}',      [PwdController::class, 'pwdDestroy'])->name('pwd.destroy');
     });
+    Route::get('/pwd/{pwd}',      [PwdController::class, 'pwdShow'])   ->name('pwd.show');
 
     // Reports — all roles can view
     Route::get('/reports',        [ReportController::class, 'index']) ->name('reports.index');
