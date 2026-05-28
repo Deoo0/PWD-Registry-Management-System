@@ -1,13 +1,5 @@
 @extends('layouts.app')
 
-{{--
-    This single file handles BOTH create and edit.
-    In your controller:
-        create() → return view('pwd.form')
-        edit($pwd) → return view('pwd.form', compact('pwd'))
-    $pwd will be null on create, populated on edit.
---}}
-
 @section('title', isset($pwd) ? 'Edit PWD' : 'Register PWD')
 @section('page-title', isset($pwd) ? 'Edit PWD Record' : 'Register New PWD')
 @section('breadcrumb')
@@ -20,7 +12,6 @@
 @section('content')
 <div class="pg">
 
-    {{-- Backend: on edit use route('pwd.update', $pwd) with @method('PUT'), on create use route('pwd.store') --}}
     <form method="POST" action="{{ isset($pwd) ? route('pwd.update', $pwd) : route('pwd.store') }}" enctype="multipart/form-data">
         @csrf
         @if(isset($pwd)) @method('PUT') @endif
@@ -30,7 +21,7 @@
             {{-- ── Left: main form ── --}}
             <div style="display:flex;flex-direction:column;gap:14px;">
 
-                {{-- Section 1-3: Application info --}}
+                {{-- Application Information --}}
                 <div class="card ani a1">
                     <div class="card-hd">
                         <div class="card-t">Application Information</div>
@@ -49,7 +40,7 @@
                     </div>
                 </div>
 
-                {{-- Section 4-6: Personal info --}}
+                {{-- Personal Information --}}
                 <div class="card ani a2">
                     <div class="card-hd">
                         <div class="card-t">Personal Information</div>
@@ -91,7 +82,7 @@
                                 <label class="fl">Sex <span style="color:var(--red)">*</span></label>
                                 <select name="sex" class="fsel fi" required>
                                     <option value="">Select…</option>
-                                    <option {{ old('sex', $pwd->sex ?? '') === 'Male' ? 'selected' : '' }}>Male</option>
+                                    <option {{ old('sex', $pwd->sex ?? '') === 'Male'   ? 'selected' : '' }}>Male</option>
                                     <option {{ old('sex', $pwd->sex ?? '') === 'Female' ? 'selected' : '' }}>Female</option>
                                 </select>
                                 @error('sex')<div class="fe">{{ $message }}</div>@enderror
@@ -99,12 +90,14 @@
                         </div>
                         <div class="g3">
                             <div class="fg">
-                                {{-- Backend: CivilStatus::all() --}}
                                 <label class="fl">Civil Status <span style="color:var(--red)">*</span></label>
                                 <select name="civil_status_id" class="fsel fi" required>
                                     <option value="">Select…</option>
-                                    @foreach(\App\Models\CivilStatus::all() as $cs)
-                                        <option value="{{ $cs->id }}" {{ old('civil_status_id', $pwd->civil_status_id ?? '') == $cs->id ? 'selected' : '' }}>{{ $cs->name }}</option>
+                                    @foreach($civilStatuses as $cs)
+                                        <option value="{{ $cs->id }}"
+                                            {{ old('civil_status_id', $pwd->civil_status_id ?? '') == $cs->id ? 'selected' : '' }}>
+                                            {{ $cs->name }}
+                                        </option>
                                     @endforeach
                                 </select>
                                 @error('civil_status_id')<div class="fe">{{ $message }}</div>@enderror
@@ -123,30 +116,28 @@
                     </div>
                 </div>
 
-                {{-- Section 8: Disability types --}}
+                {{-- Type of Disability --}}
                 <div class="card ani a2">
                     <div class="card-hd">
                         <div class="card-t">Type of Disability</div>
                         <div class="card-st">Section 8 — select all that apply</div>
                     </div>
                     <div class="mbd">
-                        {{--
-                            Backend: get selected IDs with:
-                            $selectedDisabilities = isset($pwd)
-                                ? $pwd->latestApplication?->disabilities->pluck('id')->toArray()
-                                : [];
-                        --}}
                         @php
-                            $disabilityTypes = \App\Models\DisabilityType::all();
+                            // On edit: get the IDs already linked to this PWD via the many-to-many
+                            // On create: fall back to old() input, then empty array
                             $selectedDisabilities = old('disability_types',
-                                isset($pwd) ? ($pwd->pluck('disability_type_id')->toArray() ?? []) : []
+                                isset($pwd)
+                                    ? $pwd->disabilities->pluck('id')->toArray()
+                                    : []
                             );
                         @endphp
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
                             @foreach($disabilityTypes as $dt)
-                            <label style="display:flex;align-items:center;gap:8px;padding:9px 11px;border-radius:8px;border:1px solid {{ in_array($dt->id, $selectedDisabilities) ? 'var(--blue)' : 'var(--s200)' }};cursor:pointer;background:{{ in_array($dt->id, $selectedDisabilities) ? 'var(--blue-xlt)' : 'white' }};transition:all .14s;" onclick="toggleDisability(this)">
+                            @php $checked = in_array($dt->id, (array) $selectedDisabilities); @endphp
+                            <label style="display:flex;align-items:center;gap:8px;padding:9px 11px;border-radius:8px;border:1px solid {{ $checked ? 'var(--blue)' : 'var(--s200)' }};cursor:pointer;background:{{ $checked ? 'var(--blue-xlt)' : 'white' }};transition:all .14s;" onclick="toggleDisability(this)">
                                 <input type="checkbox" name="disability_types[]" value="{{ $dt->id }}"
-                                    {{ in_array($dt->id, $selectedDisabilities) ? 'checked' : '' }}
+                                    {{ $checked ? 'checked' : '' }}
                                     style="accent-color:var(--blue);width:14px;height:14px;flex-shrink:0;">
                                 <span style="font-size:12.5px;color:var(--s700);">{{ $dt->name }}</span>
                             </label>
@@ -156,7 +147,7 @@
                     </div>
                 </div>
 
-                {{-- Section 10: Residence --}}
+                {{-- Residence Address --}}
                 <div class="card ani a3">
                     <div class="card-hd">
                         <div class="card-t">Residence Address</div>
@@ -199,7 +190,7 @@
                     </div>
                 </div>
 
-                {{-- Sections 12, 14: Education + Occupation --}}
+                {{-- Education & Occupation --}}
                 <div class="card ani a3">
                     <div class="card-hd">
                         <div class="card-t">Education &amp; Occupation</div>
@@ -208,67 +199,31 @@
                     <div class="mbd">
                         <div class="g2">
                             <div class="fg">
-                                {{-- Backend: EducationalAttainment::all() --}}
                                 <label class="fl">Educational Attainment <span style="color:var(--red)">*</span></label>
                                 <select name="educational_attainment_id" class="fsel fi" required>
                                     <option value="">Select…</option>
-                                    @foreach(\App\Models\EducationalAttainment::all() as $ea)
-                                        <option value="{{ $ea->id }}" {{ old('educational_attainment_id', $pwd->educational_attainment_id ?? '') == $ea->id ? 'selected' : '' }}>{{ $ea->name }}</option>
+                                    @foreach($educationalAttainments as $ea)
+                                        <option value="{{ $ea->id }}"
+                                            {{ old('educational_attainment_id', $pwd->educational_attainment_id ?? '') == $ea->id ? 'selected' : '' }}>
+                                            {{ $ea->name }}
+                                        </option>
                                     @endforeach
                                 </select>
                                 @error('educational_attainment_id')<div class="fe">{{ $message }}</div>@enderror
                             </div>
                             <div class="fg">
-                                {{-- Backend: Occupation::all() --}}
                                 <label class="fl">Occupation</label>
                                 <select name="occupation_id" class="fsel fi">
                                     <option value="">Select…</option>
-                                    @foreach(\App\Models\Occupation::all() as $occ)
-                                        <option value="{{ $occ->id }}" {{ old('occupation_id', $pwd->occupation_id ?? '') == $occ->id ? 'selected' : '' }}>{{ $occ->name }}</option>
+                                    @foreach($occupations as $occ)
+                                        <option value="{{ $occ->id }}"
+                                            {{ old('occupation_id', $pwd->occupation_id ?? '') == $occ->id ? 'selected' : '' }}>
+                                            {{ $occ->name }}
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                {{-- Section 17: Family Background --}}
-                <div class="card ani a4">
-                    <div class="card-hd">
-                        <div class="card-t">Family Background</div>
-                        <div class="card-st">Section 17 — Father, Mother, Guardian</div>
-                    </div>
-                    <div class="mbd">
-                        {{--
-                            Backend: pass $familyMembers = isset($pwd)
-                                ? $pwd->latestApplication?->familyMembers->keyBy('relationship')
-                                : collect();
-                        --}}
-                        @php
-                            $fm = isset($pwd) ? ($pwd->latestApplication?->familyMembers->keyBy('relationship') ?? collect()) : collect();
-                        @endphp
-                        @foreach(['Father','Mother','Guardian'] as $rel)
-                        <div style="margin-bottom:14px;padding:12px;background:var(--s50);border-radius:9px;border:1px solid var(--s200);">
-                            <p style="font-size:10px;font-weight:700;color:var(--s400);text-transform:uppercase;letter-spacing:.1em;margin-bottom:9px;">{{ $rel }}</p>
-                            <div class="g3">
-                                <div class="fg" style="margin-bottom:0;">
-                                    <label class="fl">Last Name</label>
-                                    <input type="text" name="family[{{ strtolower($rel) }}][last_name]" class="fi"
-                                        value="{{ old('family.'.strtolower($rel).'.last_name', $fm->get($rel)?->last_name ?? '') }}">
-                                </div>
-                                <div class="fg" style="margin-bottom:0;">
-                                    <label class="fl">First Name</label>
-                                    <input type="text" name="family[{{ strtolower($rel) }}][first_name]" class="fi"
-                                        value="{{ old('family.'.strtolower($rel).'.first_name', $fm->get($rel)?->first_name ?? '') }}">
-                                </div>
-                                <div class="fg" style="margin-bottom:0;">
-                                    <label class="fl">Middle Name</label>
-                                    <input type="text" name="family[{{ strtolower($rel) }}][middle_name]" class="fi"
-                                        value="{{ old('family.'.strtolower($rel).'.middle_name', $fm->get($rel)?->middle_name ?? '') }}">
-                                </div>
-                            </div>
-                        </div>
-                        @endforeach
                     </div>
                 </div>
 
@@ -282,8 +237,8 @@
                     <div class="card-hd"><div class="card-t">Photo</div></div>
                     <div class="mbd" style="text-align:center;">
                         <div id="photo-preview" style="width:110px;height:130px;border-radius:9px;border:2px dashed var(--s300);margin:0 auto 12px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--s50);cursor:pointer;" onclick="document.getElementById('photo-input').click()">
-                            @if(isset($pwd) && $pwd->latestApplication?->photo_path)
-                                <img src="{{ asset('storage/'.$pwd->latestApplication->photo_path) }}" style="width:100%;height:100%;object-fit:cover;">
+                            @if(isset($pwd) && $pwd->photo_path)
+                                <img src="{{ asset('storage/'.$pwd->photo_path) }}" style="width:100%;height:100%;object-fit:cover;">
                             @else
                                 <div style="text-align:center;color:var(--s400);">
                                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" style="width:28px;height:28px;margin:0 auto;"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
@@ -300,7 +255,7 @@
                     </div>
                 </div>
 
-                {{-- Form summary / notes --}}
+                {{-- Summary --}}
                 <div class="card ani a2">
                     <div class="card-hd"><div class="card-t">Summary</div></div>
                     <div style="padding:14px 16px;">
@@ -324,25 +279,25 @@
                             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                             {{ isset($pwd) ? 'Update Record' : 'Register PWD' }}
                         </button>
-                        <a href="{{ route('pwd.index') }}" class="btn btn-o" style="justify-content:center;">
-                            Cancel
-                        </a>
-                        @if(isset($pwd))
-                        <div style="height:1px;background:var(--s100);margin:2px 0;"></div>
-                        <form method="POST" action="{{ route('pwd.destroy', $pwd) }}" onsubmit="return confirm('Delete this PWD record? This cannot be undone.')">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="btn btn-d btn-sm" style="width:100%;justify-content:center;">
-                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                Delete Record
-                            </button>
-                        </form>
-                        @endif
-                    </div>
-                </div>
+                        <a href="{{ route('pwd.index') }}" class="btn btn-o" style="justify-content:center;">Cancel</a>
+                    
+                
 
-            </div>{{-- /right --}}
-        </div>
     </form>
+    @if(isset($pwd))
+        <div style="height:1px;background:var(--s100);margin:2px 0;"></div>
+            <form method="POST" action="{{ route('pwd.destroy', $pwd) }}" onsubmit="return confirm('Delete this PWD record? This cannot be undone.')">
+                @csrf @method('DELETE')
+                <button type="submit" class="btn btn-d btn-sm" style="width:100%;justify-content:center;">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    Delete Record
+                </button>
+            </form>
+    @endif
+    </div>
+    </div>
+    </div>{{-- /right --}}
+        </div>
 
 </div>
 @endsection
@@ -353,8 +308,8 @@ function previewPhoto(input) {
     if (input.files && input.files[0]) {
         const reader = new FileReader();
         reader.onload = e => {
-            const preview = document.getElementById('photo-preview');
-            preview.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">`;
+            document.getElementById('photo-preview').innerHTML =
+                `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">`;
         };
         reader.readAsDataURL(input.files[0]);
     }
@@ -364,10 +319,10 @@ function toggleDisability(label) {
     const cb = label.querySelector('input[type=checkbox]');
     if (cb.checked) {
         label.style.borderColor = 'var(--blue)';
-        label.style.background = 'var(--blue-xlt)';
+        label.style.background  = 'var(--blue-xlt)';
     } else {
         label.style.borderColor = 'var(--s200)';
-        label.style.background = 'white';
+        label.style.background  = 'white';
     }
 }
 </script>

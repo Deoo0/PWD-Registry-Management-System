@@ -11,6 +11,8 @@ use App\Models\Residence;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use App\Exports\PwdExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController extends Controller
 {
@@ -158,6 +160,8 @@ class ReportController extends Controller
 
     public function export(Request $request)
     {
-        // Wire up to an Excel export package (e.g. maatwebsite/excel) when ready
+        $filename = 'pwd-registry-' . now()->format('Y-m-d') . '.xlsx';
+
+        return Excel::download(new PwdExport($request), $filename);
     }
 }

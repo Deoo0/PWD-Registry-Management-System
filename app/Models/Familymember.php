@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class FamilyMember extends Model
 {
     protected $fillable = [
-        'application_id',
+        'pwd_id',
         'relationship',
         'last_name',
         'first_name',
@@ -15,9 +15,9 @@ class FamilyMember extends Model
         'suffix',
     ];
 
-    public function application(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function pwd(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(Application::class);
+        return $this->belongsTo(Pwd::class);
     }
 
     /**

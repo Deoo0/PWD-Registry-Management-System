@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('family_members', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('application_id')
-                ->constrained('applications');
+            $table->foreignId('pwd_id')
+                ->constrained('pwds');
 
             $table->enum('relationship', [
                 'Father',

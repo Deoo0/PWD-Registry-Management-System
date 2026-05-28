@@ -21,7 +21,11 @@ class RoleMiddleware
             return redirect()->route('login');
         }
 
-        if (! in_array(Auth::user()->usertype_id, array_map('intval', $roles))) {
+        $user = Auth::user();
+        // Support both a direct FK column and a relationship
+        $userRoleId = (string) ($user->usertype_id ?? $user->usertype?->id);
+
+        if (! in_array($userRoleId, $roles)) {
             abort(403, 'You do not have permission to access this page.');
         }
 

@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Pwd;
 use App\Models\PwdDisability;
 use App\Models\DisabilityType;
+use App\Models\CivilStatus;
+use App\Models\EducationalAttainment;
+use App\Models\Occupation;
 use App\Models\Residence;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
@@ -83,9 +86,19 @@ class PwdController extends Controller
     /**
      * Show the registration form.
      */
+    private function formData(): array
+    {
+        return [
+            'civilStatuses'          => CivilStatus::orderBy('name')->get(),
+            'disabilityTypes'        => DisabilityType::orderBy('name')->get(),
+            'educationalAttainments' => EducationalAttainment::orderBy('name')->get(),
+            'occupations'            => Occupation::orderBy('name')->get(),
+        ];
+    }
+
     public function pwdCreate(): View
     {
-        return view('page.pwd.form');
+        return view('page.pwd.form', $this->formData());
     }
 
     /**
@@ -159,21 +172,15 @@ class PwdController extends Controller
      */
     public function pwdEdit(Pwd $pwd): View
     {
-        $pwd->load([
-            'residence',
-            'civilStatus',
-            'educationalAttainment',
-            'occupation',
-            'disabilities',
-        ]);
+        $pwd->load(['residence', 'civilStatus', 'educationalAttainment', 'occupation', 'disabilities']);
 
-        return view('page.pwd.form', compact('pwd'));
+        return view('page.pwd.form', array_merge($this->formData(), compact('pwd')));
     }
 
     /**
      * Update an existing PWD record.
      */
-    public function update(Request $request, Pwd $pwd): RedirectResponse
+    public function pwdUpdate(Request $request, Pwd $pwd): RedirectResponse
     {
         $validated = $this->validatePwd($request, $pwd->id);
 
@@ -245,32 +252,33 @@ class PwdController extends Controller
      * Shared validation rules for store and update.
      */
     private function validatePwd(Request $request, ?int $ignoreId = null): array
-    {
-        return $request->validate([
-            'last_name'                 => ['required', 'string', 'max:100'],
-            'first_name'                => ['required', 'string', 'max:100'],
-            'middle_name'               => ['nullable', 'string', 'max:100'],
-            'suffix'                    => ['nullable', 'string', 'max:20'],
-            'date_of_birth'             => ['required', 'date', 'before:today'],
-            'sex'                       => ['required', 'in:Male,Female'],
-            'civil_status_id'           => ['required', 'exists:civil_status,id'],
-            'educational_attainment_id' => ['required', 'exists:educational_attainments,id'],
-            'occupation_id'             => ['nullable', 'exists:occupations,id'],
-            'mobile_no'                 => ['nullable', 'string', 'max:20'],
-            'email'                     => ['nullable', 'email', 'max:255'],
-            'disability_types'          => ['required', 'array', 'min:1'],
-            'disability_types.*'        => ['exists:disability_type,id'],
-            'house_no_and_street'       => ['nullable', 'string', 'max:255'],
-            'barangay'                  => ['required', 'string', 'max:100'],
-            'municipality'              => ['required', 'string', 'max:100'],
-            'province'                  => ['required', 'string', 'max:100'],
-            'region'                    => ['required', 'string', 'max:100'],
-            'photo'                     => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
-        ], [
-            'disability_types.required' => 'Please select at least one disability type.',
-            'disability_types.min'      => 'Please select at least one disability type.',
-            'date_of_birth.before'      => 'Date of birth must be in the past.',
-            'pwd_number.unique'         => 'This PWD number is already registered.',
-        ]);
-    }
+{
+    return $request->validate([
+        'last_name'                 => ['required', 'string', 'max:100'],
+        'first_name'                => ['required', 'string', 'max:100'],
+        'middle_name'               => ['nullable', 'string', 'max:100'],
+        'suffix'                    => ['nullable', 'string', 'max:20'],
+        'date_of_birth'             => ['required', 'date', 'before:today'],
+        'sex'                       => ['required', 'in:Male,Female'],
+        'civil_status_id'           => ['required', 'exists:civil_status,id'],
+        'educational_attainment_id' => ['required', 'exists:educational_attainments,id'],
+        'occupation_id'             => ['nullable', 'exists:occupations,id'],
+        'mobile_no'                 => ['nullable', 'string', 'max:20'],
+        'email'                     => ['nullable', 'email', 'max:255'],
+        'pwd_number'                => ['nullable', 'string', 'max:50', 'unique:pwds,pwd_number,' . ($ignoreId ?? 'NULL')],
+        'disability_types'          => ['required', 'array', 'min:1'],
+        'disability_types.*'        => ['exists:disability_type,id'],
+        'house_no_and_street'       => ['nullable', 'string', 'max:255'],
+        'barangay'                  => ['required', 'string', 'max:100'],
+        'municipality'              => ['required', 'string', 'max:100'],
+        'province'                  => ['required', 'string', 'max:100'],
+        'region'                    => ['required', 'string', 'max:100'],
+        'photo'                     => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+    ], [
+        'disability_types.required' => 'Please select at least one disability type.',
+        'disability_types.min'      => 'Please select at least one disability type.',
+        'date_of_birth.before'      => 'Date of birth must be in the past.',
+        'pwd_number.unique'         => 'This PWD number is already registered.',
+    ]);
+}
 }

@@ -57,12 +57,10 @@ class Pwd extends Model
     {
         return $this->belongsToMany(DisabilityType::class, 'pwd_disabilities','pwd_id','disability_type_id');
     }
-
-    public function latestApplication(): \Illuminate\Database\Eloquent\Relations\HasOne
-{
-    return $this->hasOne(Application::class)->latestOfMany();
-}
-    
+    public function familyMembers(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(FamilyMember::class);
+    }
     
     // ── Accessors ──────────────────────────────────────────────
 
