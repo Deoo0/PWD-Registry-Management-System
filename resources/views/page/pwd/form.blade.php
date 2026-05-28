@@ -233,27 +233,70 @@
             <div style="display:flex;flex-direction:column;gap:14px;position:sticky;top:calc(var(--th) + 22px);">
 
                 {{-- Photo upload --}}
-                <div class="card ani a1">
-                    <div class="card-hd"><div class="card-t">Photo</div></div>
-                    <div class="mbd" style="text-align:center;">
-                        <div id="photo-preview" style="width:110px;height:130px;border-radius:9px;border:2px dashed var(--s300);margin:0 auto 12px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--s50);cursor:pointer;" onclick="document.getElementById('photo-input').click()">
-                            @if(isset($pwd) && $pwd->photo_path)
-                                <img src="{{ asset('storage/'.$pwd->photo_path) }}" style="width:100%;height:100%;object-fit:cover;">
-                            @else
-                                <div style="text-align:center;color:var(--s400);">
-                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" style="width:28px;height:28px;margin:0 auto;"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                    <p style="font-size:10px;margin-top:4px;">1×1 Photo</p>
-                                </div>
-                            @endif
+                    <div class="card ani a1">
+                        <div class="card-hd"><div class="card-t">Photo</div></div>
+                        <div class="mbd" style="text-align:center;">
+                            <div id="photo-preview" style="width:110px;height:130px;border-radius:9px;border:2px dashed var(--s300);margin:0 auto 12px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--s50);cursor:pointer;" onclick="document.getElementById('photo-input').click()">
+                                @if(isset($pwd) && $pwd->photo_path)
+                                    <img src="{{ asset('storage/'.$pwd->photo_path) }}" style="width:100%;height:100%;object-fit:cover;">
+                                @else
+                                    <div style="text-align:center;color:var(--s400);">
+                                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" style="width:28px;height:28px;margin:0 auto;"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                        <p style="font-size:10px;margin-top:4px;">1×1 Photo</p>
+                                    </div>
+                                @endif
+                            </div>
+
+                            {{-- Hidden file inputs --}}
+                            <input type="file" id="photo-input"  name="photo" accept="image/*" style="display:none;" onchange="previewPhoto(this)">
+                            <input type="hidden" name="photo_base64" id="photo_base64">
+
+                            <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:6px;">
+                                <button type="button" class="btn btn-o btn-sm" onclick="document.getElementById('photo-input').click()" style="font-size:11.5px;">
+                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                                    Upload File
+                                </button>
+                                <button type="button" class="btn btn-o btn-sm" onclick="openCamera()" style="font-size:11.5px;">
+                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                    Use Camera
+                                </button>
+                            </div>
+                            <p style="font-size:10px;color:var(--s400);">JPG, PNG · Max 2MB</p>
                         </div>
-                        <input type="file" id="photo-input" name="photo" accept="image/*" style="display:none;" onchange="previewPhoto(this)">
-                        <button type="button" class="btn btn-o btn-sm" onclick="document.getElementById('photo-input').click()" style="font-size:11.5px;">
-                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                            Upload Photo
-                        </button>
-                        <p style="font-size:10px;color:var(--s400);margin-top:6px;">JPG, PNG · Max 2MB</p>
                     </div>
-                </div>
+
+                    {{-- ── Camera modal ── --}}
+                    <div class="mbg" id="cameraModal">
+                        <div class="modal" style="max-width:480px;">
+                            <div class="mhd">
+                                <div class="mt">Take Photo</div>
+                                <button type="button" class="mx" onclick="closeCamera()">
+                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                </button>
+                            </div>
+                            <div class="mbd" style="text-align:center;">
+                                <video id="cameraStream" autoplay playsinline style="width:100%;border-radius:8px;background:#000;display:block;"></video>
+                                <canvas id="cameraCanvas" style="display:none;"></canvas>
+                                <div id="cameraError" style="display:none;padding:20px;color:var(--red);font-size:13px;">
+                                    Camera not available. Please allow camera access or use "Upload File" instead.
+                                </div>
+
+                                {{-- Camera selector --}}
+                                <div style="margin-top:10px;">
+                                    <select id="cameraSelect" class="fsel" style="width:100%;font-size:12px;" onchange="switchCamera(this.value)">
+                                        <option value="">Select camera…</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mft">
+                                <button type="button" class="btn btn-o" onclick="closeCamera()">Cancel</button>
+                                <button type="button" class="btn btn-p" id="captureBtn" onclick="capturePhoto()">
+                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                    Capture
+                                </button>
+                            </div>
+                        </div>
+                    </div>
 
                 {{-- Summary --}}
                 <div class="card ani a2">
@@ -304,8 +347,12 @@
 
 @section('scripts')
 <script>
+// ── Photo file upload preview ─────────────────────────────
 function previewPhoto(input) {
     if (input.files && input.files[0]) {
+        // Clear camera capture so they don't conflict
+        document.getElementById('photo_base64').value = '';
+
         const reader = new FileReader();
         reader.onload = e => {
             document.getElementById('photo-preview').innerHTML =
@@ -315,6 +362,7 @@ function previewPhoto(input) {
     }
 }
 
+// ── Disability toggle ─────────────────────────────────────
 function toggleDisability(label) {
     const cb = label.querySelector('input[type=checkbox]');
     if (cb.checked) {
@@ -324,6 +372,96 @@ function toggleDisability(label) {
         label.style.borderColor = 'var(--s200)';
         label.style.background  = 'white';
     }
+}
+
+// ── Camera ────────────────────────────────────────────────
+let stream         = null;
+let currentDeviceId = null;
+
+async function openCamera() {
+    document.getElementById('cameraModal').classList.add('open');
+    document.getElementById('cameraError').style.display  = 'none';
+    document.getElementById('cameraStream').style.display = 'block';
+    document.getElementById('captureBtn').disabled        = false;
+
+    try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const cameras = devices.filter(d => d.kind === 'videoinput');
+
+        const select = document.getElementById('cameraSelect');
+        select.innerHTML = '';
+        cameras.forEach((cam, i) => {
+            const opt   = document.createElement('option');
+            opt.value   = cam.deviceId;
+            opt.text    = cam.label || `Camera ${i + 1}`;
+            select.appendChild(opt);
+        });
+
+        await startStream(cameras[0]?.deviceId ?? null);
+
+    } catch (err) {
+        showCameraError();
+    }
+}
+
+async function startStream(deviceId) {
+    if (stream) stream.getTracks().forEach(t => t.stop());
+
+    const constraints = {
+        video: deviceId
+            ? { deviceId: { exact: deviceId }, width: { ideal: 640 }, height: { ideal: 480 } }
+            : { width: { ideal: 640 }, height: { ideal: 480 } }
+    };
+
+    try {
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
+        document.getElementById('cameraStream').srcObject = stream;
+        currentDeviceId = deviceId;
+    } catch (err) {
+        showCameraError();
+    }
+}
+
+async function switchCamera(deviceId) {
+    if (deviceId) await startStream(deviceId);
+}
+
+function showCameraError() {
+    document.getElementById('cameraStream').style.display = 'none';
+    document.getElementById('cameraError').style.display  = 'block';
+    document.getElementById('captureBtn').disabled        = true;
+}
+
+function capturePhoto() {
+    const video  = document.getElementById('cameraStream');
+    const canvas = document.getElementById('cameraCanvas');
+
+    canvas.width  = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+
+    // Show in preview
+    document.getElementById('photo-preview').innerHTML =
+        `<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;">`;
+
+    // Write to hidden input for form submission
+    document.getElementById('photo_base64').value = dataUrl;
+
+    // Clear file input so they don't conflict
+    document.getElementById('photo-input').value = '';
+
+    closeCamera();
+}
+
+function closeCamera() {
+    if (stream) {
+        stream.getTracks().forEach(t => t.stop());
+        stream = null;
+    }
+    document.getElementById('cameraModal').classList.remove('open');
+    document.getElementById('cameraStream').srcObject = null;
 }
 </script>
 @endsection

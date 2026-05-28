@@ -11,10 +11,17 @@
             <div class="ph-t">PWD Registry</div>
             <div class="ph-s">{{ $pwds->total() }} registered persons with disabilities</div>
         </div>
-        <a href="{{ route('pwd.create') }}" class="btn btn-p">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-            Register PWD
-        </a>
+
+        <div style="display:flex;gap:8px;">
+            <button class="btn btn-o" onclick="document.getElementById('mImport').classList.add('open')">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                Import
+            </button>
+            <a href="{{ route('pwd.create') }}" class="btn btn-p">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                Register PWD
+            </a>
+        </div>
     </div>
 
     {{-- Filters --}}
@@ -138,4 +145,57 @@
     </div>
 
 </div>
+
+{{-- ── IMPORT MODAL ── --}}
+<div class="mbg" id="mImport">
+        <div class="modal">
+            <div class="mhd">
+                <div class="mt">Import PWDs from Excel</div>
+                <button class="mx" onclick="document.getElementById('mImport').classList.remove('open')">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <form method="POST" action="{{ route('pwd.import') }}" enctype="multipart/form-data">
+                @csrf
+                <div class="mbd">
+                    <div style="padding:12px;background:var(--blue-lt);border-radius:8px;border:1px solid var(--blue);margin-bottom:14px;">
+                        <p style="font-size:12px;color:var(--blue);font-weight:600;margin-bottom:4px;">Before importing:</p>
+                        <ul style="font-size:11.5px;color:var(--s600);padding-left:16px;line-height:1.8;">
+                            <li>Download the template and fill it in</li>
+                            <li>Civil status, education, and occupation must match exactly</li>
+                            <li>Disability types are comma-separated (e.g. "Visual Disability, Mental Disability")</li>
+                            <li>Date format: YYYY-MM-DD</li>
+                            <li>Rows with errors are skipped — valid rows still import</li>
+                        </ul>
+                    </div>
+                    <a href="{{ route('pwd.template') }}" class="btn btn-o btn-sm" style="margin-bottom:14px;display:inline-flex;">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                        Download Template
+                    </a>
+                    <div class="fg">
+                        <label class="fl">Excel / CSV File <span style="color:var(--red)">*</span></label>
+                        <input type="file" name="file" class="fi @error('file') err @enderror" accept=".xlsx,.xls,.csv" required>
+                        @error('file')<div class="fe">{{ $message }}</div>@enderror
+                    </div>
+                </div>
+                <div class="mft">
+                    <button type="button" class="btn btn-o" onclick="document.getElementById('mImport').classList.remove('open')">Cancel</button>
+                    <button type="submit" class="btn btn-p">Import</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- Import errors --}}
+    @if(session('import_errors') && count(session('import_errors')) > 0)
+    <div style="position:fixed;bottom:20px;right:20px;max-width:380px;background:white;border:1px solid var(--s200);border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.12);padding:14px;z-index:999;">
+        <p style="font-size:12px;font-weight:700;color:var(--red);margin-bottom:8px;">Some rows were skipped:</p>
+        <ul style="font-size:11.5px;color:var(--s600);padding-left:16px;max-height:200px;overflow-y:auto;line-height:1.8;">
+            @foreach(session('import_errors') as $err)
+            <li>{{ $err }}</li>
+            @endforeach
+        </ul>
+        <button onclick="this.parentElement.remove()" style="margin-top:8px;font-size:11px;color:var(--s400);background:none;border:none;cursor:pointer;">Dismiss</button>
+    </div>
+    @endif
 @endsection

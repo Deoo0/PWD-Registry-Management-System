@@ -41,6 +41,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/pwd/{pwd}/edit',    [PwdController::class, 'pwdEdit'])   ->name('pwd.edit');
         Route::put('/pwd/{pwd}',         [PwdController::class, 'pwdUpdate']) ->name('pwd.update');
         Route::delete('/pwd/{pwd}',      [PwdController::class, 'pwdDestroy'])->name('pwd.destroy');
+        Route::post('/pwd/import',            [PwdController::class, 'import'])->name('pwd.import');
+        Route::get('/pwd/download-template',  [PwdController::class, 'downloadTemplate'])->name('pwd.template');
     });
     Route::get('/pwd/{pwd}',      [PwdController::class, 'pwdShow'])   ->name('pwd.show');
 

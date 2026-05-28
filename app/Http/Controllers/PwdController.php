@@ -13,6 +13,9 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use App\Imports\PwdImport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\PwdTemplateExport;
 
 class PwdController extends Controller
 {
@@ -134,10 +137,18 @@ class PwdController extends Controller
                 'residence_id'               => $residence->id,
             ]);
 
+            // Handle file upload
             if ($request->hasFile('photo')) {
                 $pwd->update([
                     'photo_path' => $request->file('photo')->store('pwd-photos', 'public'),
                 ]);
+            }
+            // Handle camera capture (base64)
+            elseif ($request->filled('photo_base64')) {
+                $imageData = preg_replace('/^data:image\/\w+;base64,/', '', $request->photo_base64);
+                $filename  = 'pwd-photos/' . \Illuminate\Support\Str::random(40) . '.jpg';
+                \Illuminate\Support\Facades\Storage::disk('public')->put($filename, base64_decode($imageData));
+                $pwd->update(['photo_path' => $filename]);
             }
 
             if (!empty($validated['disability_types'])) {
@@ -220,10 +231,18 @@ class PwdController extends Controller
                 'pwd_number'                 => $validated['pwd_number'] ?? null,
             ]);
 
+            // Handle file upload
             if ($request->hasFile('photo')) {
                 $pwd->update([
                     'photo_path' => $request->file('photo')->store('pwd-photos', 'public'),
                 ]);
+            }
+            // Handle camera capture (base64)
+            elseif ($request->filled('photo_base64')) {
+                $imageData = preg_replace('/^data:image\/\w+;base64,/', '', $request->photo_base64);
+                $filename  = 'pwd-photos/' . \Illuminate\Support\Str::random(40) . '.jpg';
+                \Illuminate\Support\Facades\Storage::disk('public')->put($filename, base64_decode($imageData));
+                $pwd->update(['photo_path' => $filename]);
             }
 
             // sync() replaces old disability links with the new set in one call
@@ -273,7 +292,7 @@ class PwdController extends Controller
         'municipality'              => ['required', 'string', 'max:100'],
         'province'                  => ['required', 'string', 'max:100'],
         'region'                    => ['required', 'string', 'max:100'],
-        'photo'                     => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+        'photo_base64' => ['nullable', 'string'],
     ], [
         'disability_types.required' => 'Please select at least one disability type.',
         'disability_types.min'      => 'Please select at least one disability type.',
@@ -281,4 +300,30 @@ class PwdController extends Controller
         'pwd_number.unique'         => 'This PWD number is already registered.',
     ]);
 }
+
+public function import(Request $request): RedirectResponse
+{
+    $request->validate([
+        'file' => ['required', 'file', 'mimes:xlsx,xls,csv', 'max:10240'],
+    ]);
+
+    $import = new PwdImport();
+    Excel::import($import, $request->file('file'));
+
+    $message = "{$import->imported} PWD(s) imported successfully.";
+    if ($import->skipped > 0) {
+        $message .= " {$import->skipped} row(s) skipped.";
+    }
+
+    return redirect()
+        ->route('pwd.index')
+        ->with('success', $message)
+        ->with('import_errors', $import->rowErrors); // updated here too
+}
+
+
+public function downloadTemplate()
+    {
+        return Excel::download(new PwdTemplateExport(), 'pwd-import-template.xlsx');
+    }
 }
