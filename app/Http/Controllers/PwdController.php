@@ -134,6 +134,7 @@ class PwdController extends Controller
                 'mobile_no'                  => $validated['mobile_no'] ?? null,
                 'email'                      => $validated['email'] ?? null,
                 'pwd_number'                 => $validated['pwd_number'] ?? null,
+                'is_4ps_beneficiary'         => $validated['is_4ps_beneficiary'] ?? false,
                 'residence_id'               => $residence->id,
             ]);
 
@@ -229,6 +230,7 @@ class PwdController extends Controller
                 'mobile_no'                  => $validated['mobile_no'] ?? null,
                 'email'                      => $validated['email'] ?? null,
                 'pwd_number'                 => $validated['pwd_number'] ?? null,
+                'is_4ps_beneficiary'         => $validated['is_4ps_beneficiary'] ?? false,
             ]);
 
             // Handle file upload
@@ -285,6 +287,7 @@ class PwdController extends Controller
         'mobile_no'                 => ['nullable', 'string', 'max:20'],
         'email'                     => ['nullable', 'email', 'max:255'],
         'pwd_number'                => ['nullable', 'string', 'max:50', 'unique:pwds,pwd_number,' . ($ignoreId ?? 'NULL')],
+        'is_4ps_beneficiary'        => ['nullable', 'boolean'],
         'disability_types'          => ['required', 'array', 'min:1'],
         'disability_types.*'        => ['exists:disability_type,id'],
         'house_no_and_street'       => ['nullable', 'string', 'max:255'],

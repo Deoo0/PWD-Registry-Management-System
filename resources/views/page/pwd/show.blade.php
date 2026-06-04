@@ -81,6 +81,10 @@
                             <div class="fl">Occupation</div>
                             <div class="fv">{{ $pwd->occupation?->name ?? '—' }}</div>
                         </div>
+                        <div>
+                            <div class="fl">4Ps Beneficiary</div>
+                            <div class="fv">{{ $pwd->is_4ps_beneficiary ? 'Yes' : 'No' }}</div>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -23,12 +23,14 @@ class Pwd extends Model
         'mobile_no',
         'email',
         'pwd_number',
+        'is_4ps_beneficiary',
         'residence_id',
         'photo_path',
     ];
 
     protected $casts = [
-        'date_of_birth' => 'date',
+        'date_of_birth'      => 'date',
+        'is_4ps_beneficiary' => 'boolean',
     ];
 
     // ── Relationships ──────────────────────────────────────────
