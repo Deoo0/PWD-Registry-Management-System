@@ -65,6 +65,12 @@
                     <option {{ request('age_range')==='60+'   ? 'selected' : '' }} value="60+">60+ (Senior)</option>
                 </select>
 
+                <select name="is_4ps_beneficiary" class="fsel" style="width:140px;">
+                    <option value="">4Ps</option>
+                    <option value="1" {{ request('is_4ps_beneficiary') === '1' ? 'selected' : '' }}>4Ps Beneficiary</option>
+                    <option value="0" {{ request('is_4ps_beneficiary') === '0' ? 'selected' : '' }}>Not a Beneficiary</option>
+                </select>
+
                 <button type="submit" class="btn btn-p btn-sm">Filter</button>
                 <a href="{{ route('pwd.index') }}" class="btn btn-o btn-sm">Reset</a>
             </form>
