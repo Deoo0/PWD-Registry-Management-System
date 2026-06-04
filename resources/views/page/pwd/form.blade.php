@@ -113,6 +113,24 @@
                                     value="{{ old('email', $pwd->email ?? '') }}">
                             </div>
                         </div>
+                        <div class="fg">
+                                <label class="fl">4Ps Beneficiary</label>
+                                <input type="hidden" name="is_4ps_beneficiary" id="fourps-val"
+                                    value="{{ old('is_4ps_beneficiary', $pwd->is_4ps_beneficiary ?? false) ? '1' : '0' }}">
+                                <div style="display:flex;gap:8px;margin-top:6px;">
+                                    <button type="button" id="pill-yes" onclick="setPill(1)"
+                                        style="flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:{{ old('is_4ps_beneficiary', $pwd->is_4ps_beneficiary ?? false) ? '2px solid var(--blue)' : '1px solid var(--s200)' }};background:{{ old('is_4ps_beneficiary', $pwd->is_4ps_beneficiary ?? false) ? 'var(--blue-xlt)' : 'white' }};color:{{ old('is_4ps_beneficiary', $pwd->is_4ps_beneficiary ?? false) ? 'var(--blue)' : 'var(--s500)' }};">✓ Yes</button>
+                                    <button type="button" id="pill-no" onclick="setPill(0)"
+                                        style="flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:{{ !old('is_4ps_beneficiary', $pwd->is_4ps_beneficiary ?? false) ? '2px solid var(--blue)' : '1px solid var(--s200)' }};background:{{ !old('is_4ps_beneficiary', $pwd->is_4ps_beneficiary ?? false) ? 'var(--blue-xlt)' : 'white' }};color:{{ !old('is_4ps_beneficiary', $pwd->is_4ps_beneficiary ?? false) ? 'var(--blue)' : 'var(--s500)' }};">✗ No</button>
+                                </div>
+                            </div>
+                            <script>
+                            function setPill(val) {
+                                document.getElementById('fourps-val').value = val;
+                                document.getElementById('pill-yes').style.cssText = val==1 ? 'flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:2px solid var(--blue);background:var(--blue-xlt);color:var(--blue);' : 'flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--s200);background:white;color:var(--s500);';
+                                document.getElementById('pill-no').style.cssText  = val==0 ? 'flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:2px solid var(--blue);background:var(--blue-xlt);color:var(--blue);' : 'flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--s200);background:white;color:var(--s500);';
+                            }
+                            </script>
                     </div>
                 </div>
 
