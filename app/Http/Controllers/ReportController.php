@@ -69,6 +69,10 @@ class ReportController extends Controller
             );
         }
 
+        if ($request->filled('is_4ps_beneficiary')) {
+            $query->where('is_4ps_beneficiary', (bool) $request->is_4ps_beneficiary);
+        }
+
         $pwds = $query->latest()->paginate(15)->withQueryString();
 
         // ── Totals ────────────────────────────────────────────────

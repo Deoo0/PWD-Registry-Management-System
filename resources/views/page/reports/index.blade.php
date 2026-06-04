@@ -66,6 +66,14 @@
                         @endforeach
                     </select>
                 </div>
+                <div>
+                    <label class="fl">4Ps Beneficiary</label>
+                    <select name="is_4ps_beneficiary" class="fsel" style="width:110px;">
+                        <option value="">All</option>
+                        <option value="1" {{ request('is_4ps_beneficiary') === '1' ? 'selected' : '' }}>Yes</option>
+                        <option value="0" {{ request('is_4ps_beneficiary') === '0' ? 'selected' : '' }}>No</option>
+                    </select>
+                </div>
                 <div style="display:flex;gap:7px;align-items:flex-end;">
                     <button type="submit" class="btn btn-p btn-sm">Generate</button>
                     <a href="{{ route('reports.index') }}" class="btn btn-o btn-sm">Reset</a>

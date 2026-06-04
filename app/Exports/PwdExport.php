@@ -73,6 +73,10 @@ class PwdExport implements FromQuery, WithHeadings, WithMapping, WithStyles, Sho
             );
         }
 
+        if ($this->request->filled('is_4ps_beneficiary')) {
+            $query->where('is_4ps_beneficiary', (bool) $this->request->is_4ps_beneficiary);
+        }
+
         return $query->latest();
     }
 
@@ -88,6 +92,7 @@ class PwdExport implements FromQuery, WithHeadings, WithMapping, WithStyles, Sho
             'Age',
             'Sex',
             'Civil Status',
+            '4Ps Beneficiary',
             'Disability Type(s)',
             'Educational Attainment',
             'Occupation',
@@ -114,6 +119,7 @@ class PwdExport implements FromQuery, WithHeadings, WithMapping, WithStyles, Sho
             $pwd->age,
             $pwd->sex,
             $pwd->civilStatus?->name ?? '—',
+            $pwd->is_4ps_beneficiary ? 'Yes' : 'No',
             $pwd->disabilities->pluck('name')->join(', ') ?: '—',
             $pwd->educationalAttainment?->name ?? '—',
             $pwd->occupation?->name ?? '—',
