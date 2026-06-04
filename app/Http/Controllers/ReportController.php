@@ -81,6 +81,8 @@ class ReportController extends Controller
         $totalFemale = (clone $query)->where('sex', 'Female')->count();
         $totalMinor  = (clone $query)->whereRaw("EXTRACT(YEAR FROM AGE(date_of_birth)) BETWEEN 0 AND 17")->count();
         $totalSenior = (clone $query)->whereRaw("EXTRACT(YEAR FROM AGE(date_of_birth)) >= 60")->count();
+        $total4ps    = (clone $query)->where('is_4ps_beneficiary', true)->count();
+        $totalNon4ps = (clone $query)->where('is_4ps_beneficiary', false)->count();
 
         // ── Disability stats ──────────────────────────────────────
         $disabilityStats = DisabilityType::withCount(['pwds' => function ($q) use ($query) {
@@ -156,6 +158,7 @@ class ReportController extends Controller
         return view('page.reports.index', compact(
             'pwds',
             'total', 'totalMale', 'totalFemale', 'totalMinor', 'totalSenior',
+            'total4ps', 'totalNon4ps',
             'disabilityStats', 'civilStatusStats', 'ageStats',
             'educationStats', 'occupationStats', 'barangayStats',
             'disabilityTypes', 'civilStatuses'

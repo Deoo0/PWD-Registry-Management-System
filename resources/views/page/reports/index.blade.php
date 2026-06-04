@@ -103,7 +103,7 @@
     </div>
 
     {{-- ── Row 1: Disability type + Sex + Civil Status ── --}}
-    <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px;margin-bottom:14px;" class="ani a3">
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:14px;margin-bottom:14px;" class="ani a3">
 
         {{-- Disability Type Breakdown --}}
         <div class="card">
@@ -161,6 +161,33 @@
                     <div class="bar-lbl" style="width:140px;">{{ $cs['name'] }}</div>
                     <div class="bar-track"><div class="bar-fill" style="width:{{ $cs['pct'] }}%;background:{{ $cscols[$i % count($cscols)] }};"></div></div>
                     <div class="bar-cnt">{{ $cs['count'] }}</div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+
+        {{-- 4Ps Beneficiary --}}
+        <div class="card">
+            <div class="card-hd"><div class="card-t">4Ps Beneficiary</div></div>
+            <div style="padding:16px 18px;">
+                @php
+                    $fourPsPct = $total > 0 ? round($total4ps / $total * 100) : 0;
+                    $nonFourPsPct = 100 - $fourPsPct;
+                @endphp
+                <div style="height:10px;border-radius:5px;overflow:hidden;display:flex;margin-bottom:16px;background:var(--s100);">
+                    <div style="width:{{ $fourPsPct }}%;background:var(--green);transition:width .7s ease;"></div>
+                    <div style="width:{{ $nonFourPsPct }}%;background:var(--s400);"></div>
+                </div>
+                @foreach([['Yes','var(--green)',$total4ps,$fourPsPct],['No','var(--s400)',$totalNon4ps,$nonFourPsPct]] as [$lbl,$col,$cnt,$pct])
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:8px;background:var(--s50);margin-bottom:8px;border:1px solid var(--s200);">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <div style="width:10px;height:10px;border-radius:3px;background:{{ $col }};"></div>
+                        <span style="font-size:12.5px;color:var(--s600);">{{ $lbl }}</span>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--ink);line-height:1;">{{ $cnt }}</div>
+                        <div style="font-size:10px;color:var(--s400);">{{ $pct }}%</div>
+                    </div>
                 </div>
                 @endforeach
             </div>
