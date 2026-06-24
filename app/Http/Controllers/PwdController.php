@@ -156,6 +156,21 @@ class PwdController extends Controller
                 $pwd->update(['photo_path' => $filename]);
             }
 
+            // Family members
+            foreach (['father', 'mother', 'guardian'] as $rel) {
+                $fm = $request->input("family.{$rel}");
+                if (!empty($fm['first_name']) || !empty($fm['last_name'])) {
+                    \App\Models\FamilyMember::create([
+                        'pwd_id'       => $pwd->id,
+                        'relationship' => ucfirst($rel),
+                        'last_name'    => $fm['last_name']   ?? null,
+                        'first_name'   => $fm['first_name']  ?? null,
+                        'middle_name'  => $fm['middle_name'] ?? null,
+                        'suffix'       => $fm['suffix']      ?? null,
+                    ]);
+                }
+            }
+
             if (!empty($validated['disability_types'])) {
                 // sync() handles inserts cleanly on a many-to-many
                 $pwd->disabilities()->sync($validated['disability_types']);
@@ -178,6 +193,7 @@ class PwdController extends Controller
             'educationalAttainment',
             'occupation',
             'disabilities',
+            'familyMembers',    
         ]);
 
         return view('page.pwd.show', compact('pwd'));
@@ -188,7 +204,10 @@ class PwdController extends Controller
      */
     public function pwdEdit(Pwd $pwd): View
     {
-        $pwd->load(['residence', 'civilStatus', 'educationalAttainment', 'occupation', 'disabilities']);
+        $pwd->load([
+            'residence', 'civilStatus', 'educationalAttainment',
+            'occupation', 'disabilities', 'familyMembers',
+        ]);
 
         return view('page.pwd.form', array_merge($this->formData(), compact('pwd')));
     }
@@ -250,6 +269,21 @@ class PwdController extends Controller
                 \Illuminate\Support\Facades\Storage::disk('public')->put($filename, base64_decode($imageData));
                 $pwd->update(['photo_path' => $filename]);
             }
+            // Family members — delete and re-insert
+            $pwd->familyMembers()->delete();
+            foreach (['father', 'mother', 'guardian'] as $rel) {
+                $fm = $request->input("family.{$rel}");
+                if (!empty($fm['first_name']) || !empty($fm['last_name'])) {
+                    \App\Models\FamilyMember::create([
+                        'pwd_id'       => $pwd->id,
+                        'relationship' => ucfirst($rel),
+                        'last_name'    => $fm['last_name']   ?? null,
+                        'first_name'   => $fm['first_name']  ?? null,
+                        'middle_name'  => $fm['middle_name'] ?? null,
+                        'suffix'       => $fm['suffix']      ?? null,
+                    ]);
+                }
+            }
 
             // sync() replaces old disability links with the new set in one call
             $pwd->disabilities()->sync($validated['disability_types'] ?? []);
@@ -294,6 +328,11 @@ class PwdController extends Controller
         'is_4ps_beneficiary'        => ['nullable', 'boolean'],
         'disability_types'          => ['required', 'array', 'min:1'],
         'disability_types.*'        => ['exists:disability_type,id'],
+        'family'                      => ['nullable', 'array'],
+        'family.*.last_name'          => ['nullable', 'string', 'max:100'],
+        'family.*.first_name'         => ['nullable', 'string', 'max:100'],
+        'family.*.middle_name'        => ['nullable', 'string', 'max:100'],
+        'family.*.suffix'             => ['nullable', 'string', 'max:20'],
         'house_no_and_street'       => ['nullable', 'string', 'max:255'],
         'barangay'                  => ['required', 'string', 'max:100'],
         'municipality'              => ['required', 'string', 'max:100'],

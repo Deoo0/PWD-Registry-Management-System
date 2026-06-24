@@ -88,7 +88,31 @@
                     </div>
                 </div>
             </div>
-
+            {{-- Family Background --}}
+            <div class="card ani a3">
+                <div class="card-hd">
+                    <div class="card-t">Family Background</div>
+                </div>
+                <div class="mbd">
+                    @php $fm = $pwd->familyMembers->keyBy(fn($m) => strtolower($m->relationship)); @endphp
+                    @forelse(['Father','Mother','Guardian'] as $rel)
+                    @php $member = $fm->get(strtolower($rel)); @endphp
+                    <div style="margin-bottom:10px;padding:10px 12px;background:var(--s50);border-radius:8px;border:1px solid var(--s200);">
+                        <div style="font-size:10px;font-weight:700;color:var(--s400);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">{{ $rel }}</div>
+                        @if($member && ($member->first_name || $member->last_name))
+                        <div class="fv">
+                            {{ $member->last_name }}, {{ $member->first_name }}
+                            {{ $member->middle_name ? substr($member->middle_name,0,1).'.' : '' }}
+                            {{ $member->suffix ?? '' }}
+                        </div>
+                        @else
+                        <div style="font-size:12px;color:var(--s400);">Not provided</div>
+                        @endif
+                    </div>
+                    @empty
+                    @endforelse
+                </div>
+            </div>
             {{-- Address Information --}}
             <div class="card ani a2">
                 <div class="card-hd">

@@ -133,7 +133,52 @@
                             </script>
                     </div>
                 </div>
+                
+                    {{-- Section 17: Family Background --}}
+                    <div class="card ani a4">
+                        <div class="card-hd">
+                            <div class="card-t">Family Background</div>
+                            <div class="card-st">Section 17 — Father, Mother, Guardian</div>
+                        </div>
+                        <div class="mbd">
+                            @php
+                                $fm = isset($pwd)
+                                    ? $pwd->familyMembers->keyBy(fn($m) => strtolower($m->relationship))
+                                    : collect();
+                            @endphp
 
+                            @foreach(['father' => 'Father', 'mother' => 'Mother', 'guardian' => 'Guardian'] as $key => $label)
+                            <div style="margin-bottom:14px;padding:12px;background:var(--s50);border-radius:9px;border:1px solid var(--s200);">
+                                <p style="font-size:10px;font-weight:700;color:var(--s400);text-transform:uppercase;letter-spacing:.1em;margin-bottom:9px;">{{ $label }}</p>
+                                <div class="g3" style="margin-bottom:8px;">
+                                    <div class="fg" style="margin-bottom:0;">
+                                        <label class="fl">Last Name</label>
+                                        <input type="text" name="family[{{ $key }}][last_name]" class="fi"
+                                            value="{{ old('family.'.$key.'.last_name', $fm->get($key)?->last_name ?? '') }}">
+                                    </div>
+                                    <div class="fg" style="margin-bottom:0;">
+                                        <label class="fl">First Name</label>
+                                        <input type="text" name="family[{{ $key }}][first_name]" class="fi"
+                                            value="{{ old('family.'.$key.'.first_name', $fm->get($key)?->first_name ?? '') }}">
+                                    </div>
+                                    <div class="fg" style="margin-bottom:0;">
+                                        <label class="fl">Middle Name</label>
+                                        <input type="text" name="family[{{ $key }}][middle_name]" class="fi"
+                                            value="{{ old('family.'.$key.'.middle_name', $fm->get($key)?->middle_name ?? '') }}">
+                                    </div>
+                                </div>
+                                <div style="max-width:160px;">
+                                    <div class="fg" style="margin-bottom:0;">
+                                        <label class="fl">Suffix</label>
+                                        <input type="text" name="family[{{ $key }}][suffix]" class="fi" placeholder="Jr., Sr…"
+                                            value="{{ old('family.'.$key.'.suffix', $fm->get($key)?->suffix ?? '') }}">
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    
                 {{-- Type of Disability --}}
                 <div class="card ani a2">
                     <div class="card-hd">
