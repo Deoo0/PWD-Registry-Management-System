@@ -16,6 +16,13 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController extends Controller
 {
+    // SQLite-compatible age calculation
+    private function ageExpression(): string
+    {
+        return "(strftime('%Y', 'now') - strftime('%Y', date_of_birth)) - 
+                (strftime('%m-%d', 'now') < strftime('%m-%d', date_of_birth))";
+    }
+
     public function index(Request $request): View
     {
         $query = Pwd::with([
@@ -26,16 +33,18 @@ class ReportController extends Controller
             'disabilities',
         ]);
 
-        // Apply filters
+        // ── Filters ───────────────────────────────────────────────
+
         if ($barangay = $request->barangay) {
             $query->whereHas('residence', fn ($q) =>
-                $q->where('barangay', 'ilike', "%{$barangay}%")
+                //LIKE instead of ilike (SQLite is case-insensitive by default)
+                $q->where('barangay', 'LIKE', "%{$barangay}%")
             );
         }
 
         if ($municipality = $request->municipality) {
             $query->whereHas('residence', fn ($q) =>
-                $q->where('municipality', 'ilike', "%{$municipality}%")
+                $q->where('municipality', 'LIKE', "%{$municipality}%")
             );
         }
 
@@ -51,8 +60,9 @@ class ReportController extends Controller
                 '60+'   => [60, 150],
                 default => [0, 150],
             };
+            //SQLite age calculation instead of EXTRACT(YEAR FROM AGE())
             $query->whereRaw(
-                "EXTRACT(YEAR FROM AGE(date_of_birth)) BETWEEN ? AND ?",
+                $this->ageExpression() . " BETWEEN ? AND ?",
                 [$min, $max]
             );
         }
@@ -76,11 +86,12 @@ class ReportController extends Controller
         $pwds = $query->latest()->paginate(15)->withQueryString();
 
         // ── Totals ────────────────────────────────────────────────
-        $total       = $query->toBase()->getCountForPagination();
+        //count() directly instead of toBase()->getCountForPagination()
+        $total       = (clone $query)->count();
         $totalMale   = (clone $query)->where('sex', 'Male')->count();
         $totalFemale = (clone $query)->where('sex', 'Female')->count();
-        $totalMinor  = (clone $query)->whereRaw("EXTRACT(YEAR FROM AGE(date_of_birth)) BETWEEN 0 AND 17")->count();
-        $totalSenior = (clone $query)->whereRaw("EXTRACT(YEAR FROM AGE(date_of_birth)) >= 60")->count();
+        $totalMinor  = (clone $query)->whereRaw($this->ageExpression() . " BETWEEN 0 AND 17")->count();
+        $totalSenior = (clone $query)->whereRaw($this->ageExpression() . " >= 60")->count();
         $total4ps    = (clone $query)->where('is_4ps_beneficiary', true)->count();
         $totalNon4ps = (clone $query)->where('is_4ps_beneficiary', false)->count();
 
@@ -109,10 +120,12 @@ class ReportController extends Controller
             '30–59'        => [30, 59],
             '60+ (Senior)' => [60, 150],
         ];
+
         $ageStats = collect($ageGroups)->map(fn ($bounds, $range) => [
             'range' => $range,
             'count' => (clone $query)->whereRaw(
-                "EXTRACT(YEAR FROM AGE(date_of_birth)) BETWEEN ? AND ?", $bounds
+                // SQLite age calculation
+                $this->ageExpression() . " BETWEEN ? AND ?", $bounds
             )->count(),
             'pct' => 0,
         ])->values()->map(function ($a) use ($total) {

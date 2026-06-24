@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
             DisabilityTypeSeeder::class,
             EducationalAttainmentSeeder::class,
             OccupationSeeder::class,
-            PwdSeeder::class,
+            //PwdSeeder::class,
             PwdDisabilitySeeder::class,
         ]);
 
