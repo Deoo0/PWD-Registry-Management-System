@@ -78,12 +78,35 @@
                             <div class="fv">{{ $pwd->educationalAttainment?->name ?? '—' }}</div>
                         </div>
                         <div>
-                            <div class="fl">Occupation</div>
-                            <div class="fv">{{ $pwd->occupation?->name ?? '—' }}</div>
+                        <div class="fl">Occupation</div>
+                            <div class="fv">
+                                @if($pwd->occupation?->name && strtolower($pwd->occupation->name) !== 'others')
+                                    {{ $pwd->occupation->name }}
+                                @elseif($pwd->occupation_other)
+                                    {{ $pwd->occupation_other }}
+                                @else
+                                    —
+                                @endif
+                            </div>
                         </div>
                         <div>
                             <div class="fl">4Ps Beneficiary</div>
                             <div class="fv">{{ $pwd->is_4ps_beneficiary ? 'Yes' : 'No' }}</div>
+                        </div>
+                        <div>
+                        <div class="fl">Cause of Disability</div>
+                            <div class="fv">
+                                @if($pwd->disability_cause_type)
+                                    {{ $pwd->disability_cause_type }}
+                                    @if($pwd->disability_cause)
+                                        — {{ $pwd->disability_cause === 'Others' && $pwd->disability_cause_other
+                                                ? 'Others (' . $pwd->disability_cause_other . ')'
+                                                : $pwd->disability_cause }}
+                                    @endif
+                                @else
+                                    —
+                                @endif
+                            </div>
                         </div>
                     </div>
                 </div>

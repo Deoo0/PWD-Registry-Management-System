@@ -135,11 +135,15 @@ class PwdController extends Controller
                 'civil_status_id'            => $validated['civil_status_id'],
                 'educational_attainment_id'  => $validated['educational_attainment_id'],
                 'occupation_id'              => $validated['occupation_id'] ?? null,
+                'occupation_other' => $validated['occupation_other'] ?? null,
                 'mobile_no'                  => $validated['mobile_no'] ?? null,
                 'email'                      => $validated['email'] ?? null,
                 'pwd_number'                 => $validated['pwd_number'] ?? null,
                 'is_4ps_beneficiary'         => $validated['is_4ps_beneficiary'] ?? false,
                 'residence_id'               => $residence->id,
+                'disability_cause_type'  => $validated['disability_cause_type']  ?? null,
+                'disability_cause'       => $validated['disability_cause']        ?? null,
+                'disability_cause_other' => $validated['disability_cause_other']  ?? null,
             ]);
 
             // Handle file upload
@@ -250,10 +254,14 @@ class PwdController extends Controller
                 'civil_status_id'            => $validated['civil_status_id'],
                 'educational_attainment_id'  => $validated['educational_attainment_id'],
                 'occupation_id'              => $validated['occupation_id'] ?? null,
+                'occupation_other' => $validated['occupation_other'] ?? null,
                 'mobile_no'                  => $validated['mobile_no'] ?? null,
                 'email'                      => $validated['email'] ?? null,
                 'pwd_number'                 => $validated['pwd_number'] ?? null,
                 'is_4ps_beneficiary'         => $validated['is_4ps_beneficiary'] ?? false,
+                'disability_cause_type'  => $validated['disability_cause_type']  ?? null,
+                'disability_cause'       => $validated['disability_cause']        ?? null,
+                'disability_cause_other' => $validated['disability_cause_other']  ?? null,
             ]);
 
             // Handle file upload
@@ -322,12 +330,16 @@ class PwdController extends Controller
         'civil_status_id'           => ['required', 'exists:civil_status,id'],
         'educational_attainment_id' => ['required', 'exists:educational_attainments,id'],
         'occupation_id'             => ['nullable', 'exists:occupations,id'],
+        'occupation_other' => ['nullable', 'string', 'max:255'],
         'mobile_no'                 => ['nullable', 'string', 'max:20'],
         'email'                     => ['nullable', 'email', 'max:255'],
         'pwd_number'                => ['nullable', 'string', 'max:50', 'unique:pwds,pwd_number,' . ($ignoreId ?? 'NULL')],
         'is_4ps_beneficiary'        => ['nullable', 'boolean'],
         'disability_types'          => ['required', 'array', 'min:1'],
         'disability_types.*'        => ['exists:disability_type,id'],
+        'disability_cause_type'  => ['nullable', 'in:Congenital,Acquired'],
+        'disability_cause'       => ['nullable', 'string', 'max:100'],
+        'disability_cause_other' => ['nullable', 'string', 'max:255'],
         'family'                      => ['nullable', 'array'],
         'family.*.last_name'          => ['nullable', 'string', 'max:100'],
         'family.*.first_name'         => ['nullable', 'string', 'max:100'],

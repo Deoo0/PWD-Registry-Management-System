@@ -26,6 +26,10 @@ class Pwd extends Model
         'is_4ps_beneficiary',
         'residence_id',
         'photo_path',
+        'occupation_other',
+        'disability_cause_type',
+        'disability_cause',
+        'disability_cause_other',
     ];
 
     protected $casts = [

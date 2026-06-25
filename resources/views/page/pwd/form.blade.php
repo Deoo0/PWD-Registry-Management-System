@@ -210,6 +210,103 @@
                     </div>
                 </div>
 
+                {{-- Cause of Disability --}}
+                <div class="card ani a2">
+                    <div class="card-hd">
+                        <div class="card-t">Cause of Disability</div>
+                        <div class="card-st">Section 9 of DOH form</div>
+                    </div>
+                    <div class="mbd">
+
+                        {{-- Step 1: Congenital / Acquired toggle --}}
+                        <div class="fg">
+                            <label class="fl">Type of Cause <span style="color:var(--red)">*</span></label>
+                            <input type="hidden" name="disability_cause_type" id="cause_type_val"
+                                value="{{ old('disability_cause_type', $pwd->disability_cause_type ?? '') }}">
+                            <div style="display:flex;gap:8px;margin-top:6px;">
+                                @foreach(['Congenital' => 'Congenital / Inborn', 'Acquired' => 'Acquired'] as $val => $lbl)
+                                @php $active = old('disability_cause_type', $pwd->disability_cause_type ?? '') === $val; @endphp
+                                <button type="button"
+                                    id="cause-pill-{{ strtolower($val) }}"
+                                    onclick="setCauseType('{{ $val }}')"
+                                    style="flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;
+                                        border:{{ $active ? '2px solid var(--blue)' : '1px solid var(--s200)' }};
+                                        background:{{ $active ? 'var(--blue-xlt)' : 'white' }};
+                                        color:{{ $active ? 'var(--blue)' : 'var(--s500)' }};">
+                                    {{ $lbl }}
+                                </button>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        {{-- Step 2: Specific cause options — shown based on type --}}
+                        @php
+                            $congenitalOptions = ['Autism', 'ADHD', 'Cerebral Palsy', 'Down Syndrome', 'Others'];
+                            $acquiredOptions   = ['Chronic Illness', 'Cerebral Palsy', 'Injury', 'Others'];
+                            $savedCause        = old('disability_cause', $pwd->disability_cause ?? '');
+                            $savedCauseOther   = old('disability_cause_other', $pwd->disability_cause_other ?? '');
+                            $savedCauseType    = old('disability_cause_type', $pwd->disability_cause_type ?? '');
+                        @endphp
+
+                        {{-- Congenital options --}}
+                        <div id="cause_congenital" style="display:{{ $savedCauseType === 'Congenital' ? 'block' : 'none' }};margin-top:12px;">
+                            <label class="fl" style="margin-bottom:8px;">Specific Cause</label>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                                @foreach($congenitalOptions as $opt)
+                                @php $checked = $savedCauseType === 'Congenital' && $savedCause === $opt; @endphp
+                                <label style="display:flex;align-items:center;gap:8px;padding:9px 11px;border-radius:8px;
+                                            border:1px solid {{ $checked ? 'var(--blue)' : 'var(--s200)' }};
+                                            cursor:pointer;background:{{ $checked ? 'var(--blue-xlt)' : 'white' }};
+                                            transition:all .14s;"
+                                    onclick="selectCause(this, '{{ $opt }}')">
+                                    <input type="radio" name="_cause_congenital" value="{{ $opt }}"
+                                        {{ $checked ? 'checked' : '' }}
+                                        style="accent-color:var(--blue);width:14px;height:14px;flex-shrink:0;">
+                                    <span style="font-size:12.5px;color:var(--s700);">{{ $opt }}</span>
+                                </label>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        {{-- Acquired options --}}
+                        <div id="cause_acquired" style="display:{{ $savedCauseType === 'Acquired' ? 'block' : 'none' }};margin-top:12px;">
+                            <label class="fl" style="margin-bottom:8px;">Specific Cause</label>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                                @foreach($acquiredOptions as $opt)
+                                @php $checked = $savedCauseType === 'Acquired' && $savedCause === $opt; @endphp
+                                <label style="display:flex;align-items:center;gap:8px;padding:9px 11px;border-radius:8px;
+                                            border:1px solid {{ $checked ? 'var(--blue)' : 'var(--s200)' }};
+                                            cursor:pointer;background:{{ $checked ? 'var(--blue-xlt)' : 'white' }};
+                                            transition:all .14s;"
+                                    onclick="selectCause(this, '{{ $opt }}')">
+                                    <input type="radio" name="_cause_acquired" value="{{ $opt }}"
+                                        {{ $checked ? 'checked' : '' }}
+                                        style="accent-color:var(--blue);width:14px;height:14px;flex-shrink:0;">
+                                    <span style="font-size:12.5px;color:var(--s700);">{{ $opt }}</span>
+                                </label>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        {{-- Hidden input that carries the actual selected cause --}}
+                        <input type="hidden" name="disability_cause" id="cause_val" value="{{ $savedCause }}">
+
+                        {{-- Others text field --}}
+                        <div id="cause_other_wrap" style="display:{{ $savedCause === 'Others' ? 'block' : 'none' }};margin-top:10px;">
+                            <div class="fg" style="margin-bottom:0;">
+                                <label class="fl">Please specify <span style="color:var(--red)">*</span></label>
+                                <input type="text"
+                                    name="disability_cause_other"
+                                    id="disability_cause_other"
+                                    class="fi"
+                                    placeholder="Specify cause of disability…"
+                                    value="{{ $savedCauseOther }}">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
                 {{-- Residence Address --}}
                 <div class="card ani a3">
                     <div class="card-hd">
@@ -276,7 +373,7 @@
                             </div>
                             <div class="fg">
                                 <label class="fl">Occupation</label>
-                                <select name="occupation_id" class="fsel fi">
+                                <select name="occupation_id" id="occupation_select" class="fsel fi" onchange="toggleOccupationOther(this)">
                                     <option value="">Select…</option>
                                     @foreach($occupations as $occ)
                                         <option value="{{ $occ->id }}"
@@ -285,6 +382,16 @@
                                         </option>
                                     @endforeach
                                 </select>
+
+                                {{-- Others text field — shown only when "Others" is selected --}}
+                                <div id="occupation_other_wrap" style="margin-top:8px;display:none;">
+                                    <input type="text"
+                                        name="occupation_other"
+                                        id="occupation_other"
+                                        class="fi"
+                                        placeholder="Please specify occupation…"
+                                        value="{{ old('occupation_other', $pwd->occupation_other ?? '') }}">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -525,6 +632,94 @@ function closeCamera() {
     }
     document.getElementById('cameraModal').classList.remove('open');
     document.getElementById('cameraStream').srcObject = null;
+}
+
+function toggleOccupationOther(select) {
+    const selectedText = select.options[select.selectedIndex]?.text ?? '';
+    const wrap         = document.getElementById('occupation_other_wrap');
+    const input        = document.getElementById('occupation_other');
+
+    if (selectedText.toLowerCase().includes('other')) {
+        wrap.style.display  = 'block';
+        input.required      = true;
+    } else {
+        wrap.style.display  = 'none';
+        input.required      = false;
+        input.value         = '';
+    }
+}
+
+// Run on page load to restore state on validation failure or edit
+document.addEventListener('DOMContentLoaded', () => {
+    const select = document.getElementById('occupation_select');
+    if (select) toggleOccupationOther(select);
+});
+
+// ── Cause of Disability ───────────────────────────────────
+function setCauseType(type) {
+    // Update hidden input
+    document.getElementById('cause_type_val').value = type;
+
+    // Update pill buttons
+    ['congenital', 'acquired'].forEach(t => {
+        const btn = document.getElementById(`cause-pill-${t}`);
+        const active = t === type.toLowerCase();
+        btn.style.border      = active ? '2px solid var(--blue)' : '1px solid var(--s200)';
+        btn.style.background  = active ? 'var(--blue-xlt)'       : 'white';
+        btn.style.color       = active ? 'var(--blue)'           : 'var(--s500)';
+    });
+
+    // Show the correct cause options, hide the other
+    document.getElementById('cause_congenital').style.display = type === 'Congenital' ? 'block' : 'none';
+    document.getElementById('cause_acquired').style.display   = type === 'Acquired'   ? 'block' : 'none';
+
+    // Clear previous selection when switching type
+    document.getElementById('cause_val').value = '';
+    document.getElementById('cause_other_wrap').style.display = 'none';
+    document.getElementById('disability_cause_other').value   = '';
+
+    // Uncheck all radios in the hidden group
+    document.querySelectorAll('input[name="_cause_congenital"], input[name="_cause_acquired"]')
+        .forEach(r => {
+            r.checked = false;
+            const lbl = r.closest('label');
+            lbl.style.borderColor = 'var(--s200)';
+            lbl.style.background  = 'white';
+        });
+}
+
+function selectCause(label, value) {
+    // Get which group this radio belongs to
+    const radio = label.querySelector('input[type=radio]');
+    const group = radio.name; // _cause_congenital or _cause_acquired
+
+    // Deselect all in same group
+    document.querySelectorAll(`input[name="${group}"]`).forEach(r => {
+        r.checked = false;
+        const lbl = r.closest('label');
+        lbl.style.borderColor = 'var(--s200)';
+        lbl.style.background  = 'white';
+    });
+
+    // Select this one
+    radio.checked         = true;
+    label.style.borderColor = 'var(--blue)';
+    label.style.background  = 'var(--blue-xlt)';
+
+    // Write to hidden input
+    document.getElementById('cause_val').value = value;
+
+    // Toggle Others field
+    const otherWrap = document.getElementById('cause_other_wrap');
+    const otherInput = document.getElementById('disability_cause_other');
+    if (value === 'Others') {
+        otherWrap.style.display  = 'block';
+        otherInput.required      = true;
+    } else {
+        otherWrap.style.display  = 'none';
+        otherInput.required      = false;
+        otherInput.value         = '';
+    }
 }
 </script>
 @endsection
