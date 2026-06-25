@@ -46,6 +46,53 @@
                 <div class="mbd">
                     <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
                         <div>
+                            <div class="fl">Date Applied</div>
+                            <div class="fv">{{ $pwd->date_applied ? $pwd->date_applied->format('F d, Y') : '—' }}</div>
+                        </div>
+
+                        <div>
+                            <div class="fl">ID Expiry Date</div>
+                            <div class="fv">
+                                @if($pwd->date_applied)
+                                    {{ $pwd->expiry_date->format('F d, Y') }}
+                                @else
+                                    —
+                                @endif
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="fl">ID Status</div>
+                            <div class="fv">
+                                @if(!$pwd->date_applied)
+                                    <span class="badge" style="background:var(--s100);color:var(--s500);">
+                                        <span class="bd" style="background:var(--s400);"></span>No Date Applied
+                                    </span>
+                                @elseif($pwd->id_status === 'expired')
+                                    <span class="badge" style="background:#fee2e2;color:#991b1b;">
+                                        <span class="bd" style="background:#dc2626;"></span>Expired
+                                    </span>
+                                    <div style="font-size:11px;color:#991b1b;margin-top:4px;">
+                                        Expired {{ $pwd->expiry_date->diffForHumans() }}
+                                    </div>
+                                @elseif($pwd->id_status === 'expiring')
+                                    <span class="badge" style="background:#fef3c7;color:#92400e;">
+                                        <span class="bd" style="background:#d97706;"></span>Expiring Soon
+                                    </span>
+                                    <div style="font-size:11px;color:#92400e;margin-top:4px;">
+                                        Expires {{ $pwd->expiry_date->diffForHumans() }}
+                                    </div>
+                                @else
+                                    <span class="badge" style="background:#dcfce7;color:#166534;">
+                                        <span class="bd" style="background:#16a34a;"></span>Valid
+                                    </span>
+                                    <div style="font-size:11px;color:#166534;margin-top:4px;">
+                                        Expires {{ $pwd->expiry_date->format('M d, Y') }}
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                        <div>
                             <div class="fl">Full Name</div>
                             <div class="fv">{{ $pwd->last_name }}, {{ $pwd->first_name }} {{ $pwd->middle_name ? substr($pwd->middle_name,0,1).'.' : '' }} {{ $pwd->suffix ?? '' }}</div>
                         </div>

@@ -30,10 +30,12 @@ class Pwd extends Model
         'disability_cause_type',
         'disability_cause',
         'disability_cause_other',
+        'date_applied',
     ];
 
     protected $casts = [
         'date_of_birth'      => 'date',
+        'date_applied'  => 'date',
         'is_4ps_beneficiary' => 'boolean',
     ];
 
@@ -92,5 +94,19 @@ class Pwd extends Model
     // $this->disabilities is your existing BelongsToMany relationship
     return $this->disabilities->pluck('name')->implode(', ') ?: '—';
     }
- 
+    // app/Models/Pwd.php
+
+    public function getExpiryDateAttribute(): ?\Carbon\Carbon
+    {
+        return $this->date_applied?->addYears(5);
+    }
+
+    public function getIdStatusAttribute(): string
+    {
+        if (!$this->date_applied) return 'unknown';
+        $expiry = $this->expiry_date;
+        if ($expiry->isPast())                          return 'expired';
+        if (now()->diffInDays($expiry) <= 180) return 'expiring';
+        return 'valid';
+    }
 }

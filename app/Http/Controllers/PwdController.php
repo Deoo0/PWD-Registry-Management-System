@@ -61,8 +61,8 @@ class PwdController extends Controller
                 default => [0, 150],
             };
             $query->whereRaw(
-                "EXTRACT(YEAR FROM AGE(date_of_birth)) BETWEEN ? AND ?",
-                [$min, $max]
+                "(strftime('%Y', 'now') - strftime('%Y', date_of_birth)) - 
+                (strftime('%m-%d', 'now') < strftime('%m-%d', date_of_birth)) {$condition}"
             );
         }
 
@@ -87,7 +87,15 @@ class PwdController extends Controller
             ->get()
             ->map(fn ($t) => (object)['name' => $t->name, 'total' => $t->pwds_count]);
 
-        return view('page.pwd.index', compact('pwds', 'disabilityTypes', 'barangays', 'disabilityStats'));
+        // Expiry counts using PHP/Carbon instead of raw SQL so it works on both PostgreSQL and SQLite
+        $allWithDates  = Pwd::whereNotNull('date_applied')->get();
+        $expiredCount  = $allWithDates->filter(fn ($p) => $p->id_status === 'expired')->count();
+        $expiringCount = $allWithDates->filter(fn ($p) => $p->id_status === 'expiring')->count();
+
+        return view('page.pwd.index', compact(
+            'pwds', 'disabilityTypes', 'barangays', 'disabilityStats',
+            'expiredCount', 'expiringCount'
+        ));
     }
 
     /**
@@ -144,6 +152,7 @@ class PwdController extends Controller
                 'disability_cause_type'  => $validated['disability_cause_type']  ?? null,
                 'disability_cause'       => $validated['disability_cause']        ?? null,
                 'disability_cause_other' => $validated['disability_cause_other']  ?? null,
+                'date_applied' => $validated['date_applied'] ?? null,
             ]);
 
             // Handle file upload
@@ -262,6 +271,7 @@ class PwdController extends Controller
                 'disability_cause_type'  => $validated['disability_cause_type']  ?? null,
                 'disability_cause'       => $validated['disability_cause']        ?? null,
                 'disability_cause_other' => $validated['disability_cause_other']  ?? null,
+                'date_applied' => $validated['date_applied'] ?? null,
             ]);
 
             // Handle file upload
@@ -351,6 +361,7 @@ class PwdController extends Controller
         'province'                  => ['required', 'string', 'max:100'],
         'region'                    => ['required', 'string', 'max:100'],
         'photo_base64' => ['nullable', 'string'],
+        'date_applied' => ['nullable', 'date'],
     ], [
         'disability_types.required' => 'Please select at least one disability type.',
         'disability_types.min'      => 'Please select at least one disability type.',

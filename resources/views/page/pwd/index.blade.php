@@ -23,6 +23,29 @@
             </a>
         </div>
     </div>
+    
+    @if($expiredCount > 0 || $expiringCount > 0)
+        <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;" class="ani a2">
+            @if($expiredCount > 0)
+            <div style="flex:1;min-width:200px;padding:12px 16px;border-radius:10px;background:#fee2e2;border:1px solid #fca5a5;display:flex;align-items:center;gap:10px;">
+                <svg fill="none" viewBox="0 0 24 24" stroke="#dc2626" stroke-width="2" style="width:20px;height:20px;flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                <div>
+                    <div style="font-size:12px;font-weight:700;color:#991b1b;">{{ $expiredCount }} Expired ID{{ $expiredCount !== 1 ? 's' : '' }}</div>
+                    <div style="font-size:11px;color:#b91c1c;">PWD IDs that have passed the 5-year validity</div>
+                </div>
+            </div>
+            @endif
+            @if($expiringCount > 0)
+            <div style="flex:1;min-width:200px;padding:12px 16px;border-radius:10px;background:#fef3c7;border:1px solid #fcd34d;display:flex;align-items:center;gap:10px;">
+                <svg fill="none" viewBox="0 0 24 24" stroke="#d97706" stroke-width="2" style="width:20px;height:20px;flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div>
+                    <div style="font-size:12px;font-weight:700;color:#92400e;">{{ $expiringCount }} Expiring Soon</div>
+                    <div style="font-size:11px;color:#b45309;">PWD IDs expiring within the next 6 months</div>
+                </div>
+            </div>
+            @endif
+        </div>
+        @endif
 
     {{-- Filters --}}
     <div class="card ani a2" style="margin-bottom:14px;">
@@ -111,7 +134,26 @@
                             <div class="cp">{{ $pwd->last_name }}, {{ $pwd->first_name }} {{ $pwd->middle_name ?? '' }} {{ $pwd->suffix ?? '' }}</div>
                             <div class="cs">{{ $pwd->mobile_no ?? $pwd->email ?? '—' }}</div>
                         </td>
-                        <td style="font-family:monospace;font-size:11.5px;color:var(--s500);">{{ $pwd->pwd_number ?? '—' }}</td>
+                        <td style="font-family:monospace;font-size:11.5px;color:var(--s500);">
+                            {{ $pwd->pwd_number ?? '—' }}
+                            @if($pwd->date_applied)
+                                <div style="margin-top:3px;">
+                                    @if($pwd->id_status === 'expired')
+                                        <span style="font-size:9.5px;font-weight:700;padding:2px 6px;border-radius:4px;background:#fee2e2;color:#991b1b;font-family:sans-serif;">
+                                            EXPIRED
+                                        </span>
+                                    @elseif($pwd->id_status === 'expiring')
+                                        <span style="font-size:9.5px;font-weight:700;padding:2px 6px;border-radius:4px;background:#fef3c7;color:#92400e;font-family:sans-serif;">
+                                            EXPIRING
+                                        </span>
+                                    @else
+                                        <span style="font-size:9.5px;font-weight:700;padding:2px 6px;border-radius:4px;background:#dcfce7;color:#166534;font-family:sans-serif;">
+                                            VALID
+                                        </span>
+                                    @endif
+                                </div>
+                            @endif
+                        </td>
                         <td><span class="badge {{ $pwd->sex === 'Male' ? 'b-m' : 'b-f' }}">{{ $pwd->sex }}</span></td>
                         <td style="font-size:13px;">
                             {{ $pwd->age }}

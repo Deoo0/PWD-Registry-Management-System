@@ -36,6 +36,12 @@
                                     value="{{ old('pwd_number', $pwd->pwd_number ?? '') }}">
                                 @error('pwd_number')<div class="fe">{{ $message }}</div>@enderror
                             </div>
+                            <div class="fg">
+                                <label class="fl">Date Applied</label>
+                                <input type="date" name="date_applied" class="fi @error('date_applied') err @enderror"
+                                    value="{{ old('date_applied', isset($pwd) && $pwd->date_applied ? $pwd->date_applied->format('Y-m-d') : '') }}">
+                                @error('date_applied')<div class="fe">{{ $message }}</div>@enderror
+                            </div>
                         </div>
                     </div>
                 </div>

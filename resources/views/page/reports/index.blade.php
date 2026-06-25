@@ -23,6 +23,16 @@
             <p style="font-size:9.5px;font-weight:700;color:var(--s400);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;">Filter Report</p>
             <form method="GET" action="{{ route('reports.index') }}" style="display:flex;gap:9px;flex-wrap:wrap;align-items:flex-end;">
                 <div>
+                    <label class="fl">ID Status</label>
+                    <select name="expiry_status" class="fsel" style="width:150px;">
+                        <option value="">All Statuses</option>
+                        <option value="valid"    {{ request('expiry_status') === 'valid'    ? 'selected' : '' }}>✓ Valid</option>
+                        <option value="expiring" {{ request('expiry_status') === 'expiring' ? 'selected' : '' }}>⚠ Expiring Soon</option>
+                        <option value="expired"  {{ request('expiry_status') === 'expired'  ? 'selected' : '' }}>✗ Expired</option>
+                        <option value="unknown"  {{ request('expiry_status') === 'unknown'  ? 'selected' : '' }}>— No Date Set</option>
+                    </select>
+                </div>
+                <div>
                     <label class="fl">Barangay</label>
                     <input type="text" name="barangay" class="fi" style="width:150px;" placeholder="e.g. Abucay" value="{{ request('barangay') }}">
                 </div>
@@ -83,6 +93,23 @@
     </div>
 
     {{-- ── Top stat cards ── --}}
+    {{-- ── ID Validity Status cards ── --}}
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;" class="ani a2">
+        @foreach([
+            ['Valid',         $validCount,    '#dcfce7', '#16a34a', '#166534'],
+            ['Expiring Soon', $expiringCount, '#fef3c7', '#d97706', '#92400e'],
+            ['Expired',       $expiredCount,  '#fee2e2', '#dc2626', '#991b1b'],
+            ['No Date Set',   $unknownCount,  'var(--s100)', 'var(--s400)', 'var(--s600)'],
+        ] as [$lbl, $cnt, $bg, $dot, $text])
+        <div style="padding:14px 16px;border-radius:12px;background:{{ $bg }};border:1px solid {{ $dot }}20;display:flex;align-items:center;gap:12px;">
+            <div style="width:10px;height:10px;border-radius:50%;background:{{ $dot }};flex-shrink:0;"></div>
+            <div>
+                <div style="font-size:22px;font-weight:800;color:{{ $text }};line-height:1;">{{ $cnt }}</div>
+                <div style="font-size:11px;font-weight:600;color:{{ $text }};margin-top:2px;">{{ $lbl }}</div>
+            </div>
+        </div>
+        @endforeach
+    </div>
     <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px;" class="ani a2">
         @foreach([
             ['Total PWDs',    $total,        'linear-gradient(90deg,var(--navy),var(--blue-h))', 'var(--blue-lt)',  'var(--blue)'],

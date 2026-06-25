@@ -62,8 +62,8 @@ class ReportController extends Controller
             };
             //SQLite age calculation instead of EXTRACT(YEAR FROM AGE())
             $query->whereRaw(
-                $this->ageExpression() . " BETWEEN ? AND ?",
-                [$min, $max]
+                "(strftime('%Y', 'now') - strftime('%Y', date_of_birth)) - 
+                (strftime('%m-%d', 'now') < strftime('%m-%d', date_of_birth)) {$condition}"
             );
         }
 
@@ -82,18 +82,71 @@ class ReportController extends Controller
         if ($request->filled('is_4ps_beneficiary')) {
             $query->where('is_4ps_beneficiary', (bool) $request->is_4ps_beneficiary);
         }
+        // Expiry status filter — done via subquery on date_applied
+        if ($expiryStatus = $request->expiry_status) {
+            $expiredBefore  = now()->subYears(5)->toDateString();
+            $expiringSoon   = now()->subYears(5)->addMonths(6)->toDateString();
+
+            match($expiryStatus) {
+                'expired'  => $query->whereNotNull('date_applied')
+                                    ->whereDate('date_applied', '<', $expiredBefore),
+                'expiring' => $query->whereNotNull('date_applied')
+                                    ->whereBetween('date_applied', [$expiredBefore, $expiringSoon]),
+                'valid'    => $query->whereNotNull('date_applied')
+                                    ->whereDate('date_applied', '>=', $expiringSoon),
+                'unknown'  => $query->whereNull('date_applied'),
+                default    => null,
+            };
+        }
 
         $pwds = $query->latest()->paginate(15)->withQueryString();
 
         // ── Totals ────────────────────────────────────────────────
         //count() directly instead of toBase()->getCountForPagination()
-        $total       = (clone $query)->count();
+        $total       = $query->toBase()->getCountForPagination();
         $totalMale   = (clone $query)->where('sex', 'Male')->count();
         $totalFemale = (clone $query)->where('sex', 'Female')->count();
-        $totalMinor  = (clone $query)->whereRaw($this->ageExpression() . " BETWEEN 0 AND 17")->count();
-        $totalSenior = (clone $query)->whereRaw($this->ageExpression() . " >= 60")->count();
+        // ── Totals ────────────────────────────────────────────────
+
+        // SQLite-compatible age calculation using strftime
+        $totalMinor  = (clone $query)->whereRaw(
+            "(strftime('%Y', 'now') - strftime('%Y', date_of_birth)) - 
+            (strftime('%m-%d', 'now') < strftime('%m-%d', date_of_birth)) BETWEEN 0 AND 17"
+        )->count();
+
+        $totalSenior = (clone $query)->whereRaw(
+            "(strftime('%Y', 'now') - strftime('%Y', date_of_birth)) - 
+            (strftime('%m-%d', 'now') < strftime('%m-%d', date_of_birth)) >= 60"
+        )->count();
+
+        // ── Age stats ─────────────────────────────────────────────
+        $ageGroups = [
+            '0–17 (Minor)' => ["BETWEEN 0 AND 17",  []],
+            '18–29'        => ["BETWEEN 18 AND 29", []],
+            '30–59'        => ["BETWEEN 30 AND 59", []],
+            '60+ (Senior)' => [">= 60",             []],
+        ];
+
+        $ageStats = collect($ageGroups)->map(fn ($args, $range) => [
+            'range' => $range,
+            'count' => (clone $query)->whereRaw(
+                "(strftime('%Y', 'now') - strftime('%Y', date_of_birth)) - 
+                (strftime('%m-%d', 'now') < strftime('%m-%d', date_of_birth)) {$args[0]}"
+            )->count(),
+            'pct' => 0,
+        ])->values()->map(function ($a) use ($total) {
+            $a['pct'] = $total > 0 ? round($a['count'] / $total * 100) : 0;
+            return $a;
+        });
         $total4ps    = (clone $query)->where('is_4ps_beneficiary', true)->count();
         $totalNon4ps = (clone $query)->where('is_4ps_beneficiary', false)->count();
+
+        // ── Expiry stats ──────────────────────────────────────
+        $allWithDates  = Pwd::whereNotNull('date_applied')->get();
+        $validCount    = $allWithDates->filter(fn ($p) => $p->id_status === 'valid')->count();
+        $expiringCount = $allWithDates->filter(fn ($p) => $p->id_status === 'expiring')->count();
+        $expiredCount  = $allWithDates->filter(fn ($p) => $p->id_status === 'expired')->count();
+        $unknownCount  = Pwd::whereNull('date_applied')->count();
 
         // ── Disability stats ──────────────────────────────────────
         $disabilityStats = DisabilityType::withCount(['pwds' => function ($q) use ($query) {
@@ -167,11 +220,14 @@ class ReportController extends Controller
         // ── Filter dropdowns ──────────────────────────────────────
         $disabilityTypes = DisabilityType::orderBy('name')->get();
         $civilStatuses   = CivilStatus::orderBy('name')->get();
+        $total4ps    = (clone $query)->where('is_4ps_beneficiary', 1)->count();
+        $totalNon4ps = (clone $query)->where('is_4ps_beneficiary', 0)->count();
 
         return view('page.reports.index', compact(
             'pwds',
             'total', 'totalMale', 'totalFemale', 'totalMinor', 'totalSenior',
             'total4ps', 'totalNon4ps',
+            'validCount', 'expiringCount', 'expiredCount', 'unknownCount',
             'disabilityStats', 'civilStatusStats', 'ageStats',
             'educationStats', 'occupationStats', 'barangayStats',
             'disabilityTypes', 'civilStatuses'
