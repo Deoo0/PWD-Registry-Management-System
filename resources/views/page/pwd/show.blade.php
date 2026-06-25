@@ -95,22 +95,36 @@
                 </div>
                 <div class="mbd">
                     @php $fm = $pwd->familyMembers->keyBy(fn($m) => strtolower($m->relationship)); @endphp
-                    @forelse(['Father','Mother','Guardian'] as $rel)
+                    @foreach(['Father','Mother','Guardian'] as $rel)
                     @php $member = $fm->get(strtolower($rel)); @endphp
-                    <div style="margin-bottom:10px;padding:10px 12px;background:var(--s50);border-radius:8px;border:1px solid var(--s200);">
-                        <div style="font-size:10px;font-weight:700;color:var(--s400);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">{{ $rel }}</div>
+                    <div style="margin-bottom:12px;padding:12px;background:var(--s50);border-radius:9px;border:1px solid var(--s200);">
+                        <p style="font-size:10px;font-weight:700;color:var(--s400);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;">{{ $rel }}</p>
                         @if($member && ($member->first_name || $member->last_name))
-                        <div class="fv">
-                            {{ $member->last_name }}, {{ $member->first_name }}
-                            {{ $member->middle_name ? substr($member->middle_name,0,1).'.' : '' }}
-                            {{ $member->suffix ?? '' }}
+                        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+                            <div>
+                                <div class="fl">Last Name</div>
+                                <div class="fv">{{ $member->last_name ?? '—' }}</div>
+                            </div>
+                            <div>
+                                <div class="fl">First Name</div>
+                                <div class="fv">{{ $member->first_name ?? '—' }}</div>
+                            </div>
+                            <div>
+                                <div class="fl">Middle Name</div>
+                                <div class="fv">{{ $member->middle_name ?? '—' }}</div>
+                            </div>
+                            @if($member->suffix)
+                            <div>
+                                <div class="fl">Suffix</div>
+                                <div class="fv">{{ $member->suffix }}</div>
+                            </div>
+                            @endif
                         </div>
                         @else
                         <div style="font-size:12px;color:var(--s400);">Not provided</div>
                         @endif
                     </div>
-                    @empty
-                    @endforelse
+                    @endforeach
                 </div>
             </div>
             {{-- Address Information --}}

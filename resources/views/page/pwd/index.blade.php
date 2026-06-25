@@ -108,7 +108,7 @@
                     @forelse($pwds as $pwd)
                     <tr>
                         <td>
-                            <div class="cp">{{ $pwd->last_name }}, {{ $pwd->first_name }} {{ $pwd->middle_name ? substr($pwd->middle_name,0,1).'.' : '' }} {{ $pwd->suffix ?? '' }}</div>
+                            <div class="cp">{{ $pwd->last_name }}, {{ $pwd->first_name }} {{ $pwd->middle_name ?? '' }} {{ $pwd->suffix ?? '' }}</div>
                             <div class="cs">{{ $pwd->mobile_no ?? $pwd->email ?? '—' }}</div>
                         </td>
                         <td style="font-family:monospace;font-size:11.5px;color:var(--s500);">{{ $pwd->pwd_number ?? '—' }}</td>
